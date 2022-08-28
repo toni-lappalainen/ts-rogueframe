@@ -30,5 +30,5 @@ export const WALL: Tile = {
 	visible: false,
 	seen: false,
 	dark: { char: '#', fg: Colors.Gray, bg: Colors.Black },
-	light: { char: '#', fg: Colors.White, bg: Colors.BrownLight },
+	light: { char: '#', fg: Colors.White, bg: Colors.Black },
 }

@@ -36,6 +36,10 @@ export const renderNamesAtLocation = (x: number, y: number) => {
 			.map((e) => e.name.charAt(0).toUpperCase() + e.name.substring(1))
 			.join(', ')
 
-		window.engine.display.drawText(x, y, names)
+		window.engine.display.drawText(
+			mousePos.x + 1,
+			mousePos.y - 1,
+			`%c{green}` + names
+		)
 	}
 }

@@ -91,7 +91,7 @@ export class Engine {
 		this.display.clear()
 		this.messageLog.render(this.display, 21, 45, 40, 5)
 		renderHearts(this.display, 1, 47, 5)
-		renderNamesAtLocation(1, 44)
 		this.gameMap.render()
+		renderNamesAtLocation(1, 44)
 	}
 }
