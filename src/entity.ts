@@ -21,8 +21,8 @@ export class Entity {
 		public bg: string = Colors.Black,
 		public blocksMovement: boolean = true,
 		public pos: Point = { x: 0, y: 0 },
-		public parent: GameMap | Component | null = null,
-		private components: Map<string, any> = new Map<string, any>() // FIXME: don't use any
+		public parent: GameMap | Component | null = null, //Map<string, any> = new Map<string, any>() // FIXME: don't use any
+		private components: any = {}
 	) {
 		if (this.parent && this.parent instanceof GameMap) {
 			this.parent.entities.push(this)
@@ -40,10 +40,11 @@ export class Entity {
 	}
 
 	update() {
-		this.components.forEach((value) => {
-			value.update()
-		})
+		for (const cmp of Object.values(this.components) as any) {
+			cmp.update()
+		}
 	}
+
 	place(pos: Point, gameMap: GameMap | undefined) {
 		this.pos = pos
 		if (gameMap) {
@@ -68,13 +69,13 @@ export class Entity {
 	add = (cmps: Component[]) => {
 		for (let cmp of cmps) {
 			cmp.entity = this
-			const name = cmp.constructor.name.replace('Cmp', '').toLocaleLowerCase()
-			this.components.set(name, cmp)
+			const name = cmp.constructor.name.replace('Cmp', '').toLowerCase()
+			this.components[name] = cmp
 		}
 	}
 
 	has = (cmpClass: string) => {
-		if (this.components.has(cmpClass)) return true
+		if (this.components[cmpClass.toLowerCase()] !== undefined) return true
 		else {
 			console.log(`Component ${cmpClass} not found on ${this.name}`)
 			return false
@@ -83,18 +84,18 @@ export class Entity {
 
 	getEffect = (): Effect | null => {
 		let component = null
-		this.components.forEach((cmp) => {
-			if (typeof cmp.activate === 'function') component = cmp
-		})
+		for (const [key, value] of Object.entries(this.components) as any) {
+			if (typeof value.activate === 'function') component = value
+		}
 		return component
 	}
 
 	get = (cmpClass: string) => {
-		return this.components.get(cmpClass)
+		return this.components[cmpClass]
 	}
 
 	remove = (cmpClass: string) => {
-		this.components.delete(cmpClass)
+		delete this.components.delete[cmpClass]
 	}
 }
 
