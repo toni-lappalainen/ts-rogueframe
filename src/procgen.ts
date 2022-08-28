@@ -1,8 +1,9 @@
 import { FLOOR, WALL, Tile } from './tiles'
 import { GameMap } from './map'
 import { Display } from 'rot-js'
-import { Entity } from './entity'
+import { Entity, spawnEntity } from './entity'
 import { generateRandomNumber } from './utils'
+import orcData from '../res/prefab/orc.json'
 
 interface Bounds {
 	x1: number
@@ -33,8 +34,8 @@ class RectangularRoom {
 		return {
 			x1: this.x,
 			y1: this.y,
-			x2: this.x + this.width,
-			y2: this.y + this.height,
+			x2: this.x + this.width - 1,
+			y2: this.y + this.height - 1,
 		}
 	}
 
@@ -104,9 +105,9 @@ const placeEntities = (
 		const y = generateRandomNumber(bounds.y1 + 1, bounds.y2 - 1)
 
 		if (!dungeon.entities.some((e) => e.pos == { x, y })) {
-			//e.x == x && e.y == y)) {
-			if (Math.random() < 0.8) console.log('orc')
-			else console.log('troll')
+			const orc = spawnEntity(orcData)
+			orc.pos = { x: x, y: y }
+			dungeon.entities.push(spawnEntity(orc))
 		}
 	}
 }

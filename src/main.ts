@@ -10,4 +10,5 @@ declare global {
 
 window.addEventListener('DOMContentLoaded', () => {
 	window.engine = new Engine(spawnEntity(playerData))
+	window.engine.render()
 })

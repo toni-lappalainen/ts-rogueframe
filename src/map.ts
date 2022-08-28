@@ -4,6 +4,7 @@ import type { Tile } from './tiles'
 import { WALL } from './tiles'
 import { Display } from 'rot-js'
 import { Colors } from './values'
+import { isEqual } from './utils'
 
 export class GameMap {
 	tiles: Tile[][]
@@ -29,12 +30,15 @@ export class GameMap {
 		return this.entities.filter((e) => e.name !== 'Player')
 	}
 
-	isInBounds(x: number, y: number) {
-		return 0 <= x && x < this.width && 0 <= y && y < this.height
+	isInBounds(pos: Point) {
+		return 0 <= pos.x && pos.x < this.width && 0 <= pos.y && pos.y < this.height
 	}
 
-	getBlockingEntityAtLocation(x: number, y: number): Entity | undefined {
-		return this.entities.find((e) => e.blocksMovement && e.pos == { x, y }) //e.pos.x === x && e.pos.y === y)
+	getBlockingEntityAtLocation(pos: Point): Entity | undefined {
+		return this.entities.find((e) => e.blocksMovement && isEqual(e.pos, pos)) //e.pos.x === x && e.pos.y === y)
+	}
+	getEntityAtLocation(pos: Point): Entity | undefined {
+		return this.entities.find((e) => isEqual(e.pos, pos))
 	}
 
 	addRoom(x: number, y: number, roomTiles: Tile[][]) {
@@ -48,7 +52,7 @@ export class GameMap {
 	}
 
 	lightPasses(x: number, y: number): boolean {
-		if (this.isInBounds(x, y)) {
+		if (this.isInBounds({ x, y })) {
 			return this.tiles[y][x].transparent
 		}
 		return false
@@ -97,9 +101,19 @@ export class GameMap {
 				this.display.draw(x, y, char, fg, bg)
 			}
 		}
-		this.entities.forEach((e) => {
+		const sortedEntities = this.entities
+			.slice()
+			.sort((a, b) => a.renderOrder - b.renderOrder)
+
+		sortedEntities.forEach((e) => {
 			if (this.tiles[e.pos.y][e.pos.x].visible) {
-				this.display.draw(e.pos.x, e.pos.y, e.char, e.fg, e.bg)
+				this.display.draw(
+					e.pos.x,
+					e.pos.y,
+					e.char,
+					e.fg,
+					this.tiles[e.pos.y][e.pos.x].light.bg
+				)
 			}
 		})
 	}

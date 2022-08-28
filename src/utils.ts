@@ -5,3 +5,7 @@ export const generateRandomNumber = (min: number, max: number) => {
 export const addXY = (p1: Point, p2: Point): Point => {
 	return { x: p1.x + p2.x, y: p1.y + p2.y }
 }
+
+export const isEqual = (p1: Point, p2: Point) => {
+	return JSON.stringify(p1) === JSON.stringify(p2)
+}

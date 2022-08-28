@@ -20,8 +20,8 @@ export const FLOOR: Tile = {
 	transparent: true,
 	visible: false,
 	seen: false,
-	dark: { char: ' ', fg: Colors.White, bg: Colors.Black },
-	light: { char: ' ', fg: Colors.White, bg: Colors.Yellow },
+	dark: { char: '.', fg: Colors.Gray, bg: Colors.Black },
+	light: { char: '.', fg: Colors.White, bg: Colors.Black },
 }
 
 export const WALL: Tile = {
@@ -29,6 +29,6 @@ export const WALL: Tile = {
 	transparent: false,
 	visible: false,
 	seen: false,
-	dark: { char: '#', fg: Colors.White, bg: Colors.Black },
-	light: { char: ' ', fg: '#fff', bg: Colors.BrownLight },
+	dark: { char: '#', fg: Colors.Gray, bg: Colors.Black },
+	light: { char: '#', fg: Colors.White, bg: Colors.BrownLight },
 }

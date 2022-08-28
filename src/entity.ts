@@ -1,18 +1,24 @@
 import { Colors } from './values'
 import { Component, componentList } from './components/component'
-import { BodyCmp } from './components/body'
-import playerData from '../res/prefab/player.json'
+
+export enum RenderOrder {
+	Corpse,
+	Item,
+	Actor,
+	Player,
+}
 
 export class Entity {
 	readonly id: string
 	constructor(
 		public name: string = '<Unnamed>',
 		public char: string = ' ',
-		public pos: Point = { x: 0, y: 0 },
+		public renderOrder: RenderOrder = RenderOrder.Corpse,
 		public fg: string = Colors.White,
 		public bg: string = Colors.Black,
 		public blocksMovement: boolean = true,
-		private components: Map<string, Component> = new Map<string, Component>()
+		public pos: Point = { x: 0, y: 0 },
+		private components: Map<string, any> = new Map<string, any>() // FIXME: don't use any
 	) {
 		this.char = char
 		this.pos = pos
@@ -52,8 +58,17 @@ export class Entity {
 }
 
 export const spawnEntity = (data: any) => {
-	const { name, char, pos, fg, bg, blocksMovement, components } = data
-	const entity = new Entity(name, char, pos, fg, bg, blocksMovement)
+	const { name, char, renderOrder, fg, bg, blocksMovement, pos, components } =
+		data
+	const entity = new Entity(
+		name,
+		char,
+		renderOrder,
+		fg,
+		bg,
+		blocksMovement,
+		pos
+	)
 
 	const entityCmps = []
 	for (const [key, value] of Object.entries(components)) {

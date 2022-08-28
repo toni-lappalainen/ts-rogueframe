@@ -21,26 +21,17 @@ export class WaitAction implements Action {
 
 export class MovementAction extends ActionWithDirection {
 	perform(entity: Entity) {
-		console.log(this.dir)
 		const direction = addXY(entity.pos, this.dir)
-		console.log(direction)
 
-		if (!window.engine.gameMap.isInBounds(direction.x, direction.y)) return
+		if (!window.engine.gameMap.isInBounds(direction)) return
 		if (!window.engine.gameMap.tiles[direction.y][direction.x].walkable) return
-		if (
-			window.engine.gameMap.getBlockingEntityAtLocation(
-				direction.x,
-				direction.y
-			)
-		)
-			return
+		if (window.engine.gameMap.getBlockingEntityAtLocation(direction)) return
 		entity.move(this.dir)
 	}
 }
-/*
 export class MeleeAction extends ActionWithDirection {
 	perform(entity: Entity) {
-		const dest = { x: entity.pos.x + this.d.x, y: entity.pos.y + this.d.y }
+		const dest = addXY(entity.pos, this.dir)
 
 		const target = window.engine.gameMap.getBlockingEntityAtLocation(dest)
 
@@ -48,21 +39,20 @@ export class MeleeAction extends ActionWithDirection {
 
 		console.log(`You kick the ${target.name}, much to its annoyance!`)
 	}
-}*/
-/*
+}
+
 export class BumpAction extends ActionWithDirection {
 	perform(entity: Entity) {
-		const destX = entity.x + this.dx
-		const destY = entity.y + this.dy
+		const dest = addXY(entity.pos, this.dir)
 
-		if (window.engine.gameMap.getBlockingEntityAtLocation(destX, destY)) {
-			return new MeleeAction(this.dx, this.dy).perform(entity)
+		if (window.engine.gameMap.getBlockingEntityAtLocation(dest)) {
+			return new MeleeAction(dest).perform(entity)
 		} else {
-			return new MovementAction(this.dx, this.dy).perform(entity)
+			return new MovementAction(dest).perform(entity)
 		}
 	}
 }
-*/
+
 const MOVE_KEYS: MovementMap = {
 	ArrowUp: new MovementAction({ x: 0, y: -1 }),
 	ArrowDown: new MovementAction({ x: 0, y: 1 }),
