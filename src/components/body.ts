@@ -14,6 +14,7 @@ export class BodyCmp implements Component {
 		this._hp = maxHp
 		this.entity = null
 	}
+	update() {}
 
 	public get hp(): number {
 		return this._hp
@@ -24,6 +25,20 @@ export class BodyCmp implements Component {
 		if (this._hp === 0 && this.isAlive) {
 			this.die()
 		}
+	}
+
+	takeDamage(amount: number) {
+		this.hp -= amount
+	}
+
+	heal(amount: number): number {
+		if (this.hp === this.maxHp) return 0
+
+		const newHp = Math.min(this.maxHp, this.hp + amount)
+		const amountRecovered = newHp - this.hp
+		this.hp = newHp
+
+		return amountRecovered
 	}
 
 	die() {
@@ -42,7 +57,6 @@ export class BodyCmp implements Component {
 		//this.entity.ai = null
 		this.entity.name = `Remains of ${this.entity.name}`
 		this.entity.renderOrder = RenderOrder.Corpse
-
-		console.log(deathMessage)
+		window.engine.messageLog.addMessage(deathMessage)
 	}
 }

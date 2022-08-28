@@ -1,0 +1,18 @@
+{
+	"name": "Green mushroom",
+	"char": "🍄",
+	"renderOrder": 2,
+	"fg": "#FFF",
+	"bg": "#000",
+	"blocksMovement": false,
+	"pos": { "x": 0, "y": 0 },
+	"components": {
+		"Item": {
+			"weight": 1,
+			"consumable": true
+		},
+		"Healing": {
+			"amount": 5
+		}
+	}
+}

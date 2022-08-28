@@ -3,6 +3,7 @@ import { Entity } from './entity'
 import { isEqual } from './utils'
 
 import { Colors } from './values'
+import { Inventory } from './components/inventory'
 
 const drawColoredBar = (
 	display: Display,
@@ -52,12 +53,11 @@ export const renderFrameWithTitle = (
 
 	const innerWidth = width - 2
 	const innerHeight = height - 2
-	const remainingAfterTitle = innerWidth - (title.length + 3) // adding two because of the borders on left and right
+	const remainingAfterTitle = innerWidth - (title.length + 2) // adding two because of the borders on left and right
 	const left = Math.floor(remainingAfterTitle / 2)
 
 	const topRow =
 		topLeft +
-		'X' +
 		horizontal.repeat(left) +
 		leftTitle +
 		title +
@@ -72,4 +72,25 @@ export const renderFrameWithTitle = (
 		window.engine.display.drawText(x, y + i, middleRow)
 	}
 	window.engine.display.drawText(x, y + height - 1, bottomRow)
+}
+
+export const renderInventory = (title: string) => {
+	const player = window.engine.player
+	const inventory: Inventory = player.get('inventory')
+	const itemCount = inventory.items.length
+	const height = itemCount + 2 <= 3 ? 3 : itemCount + 2
+	const width = title.length + 12
+	const x = player.pos.x <= 30 ? 40 : 0
+	const y = 3
+
+	renderFrameWithTitle(x, y, width, height, title)
+
+	if (itemCount > 0) {
+		inventory.items.forEach((i, index) => {
+			const key = String.fromCharCode('a'.charCodeAt(0) + index)
+			window.engine.display.drawText(x + 1, y + index + 1, `(${key}) ${i.name}`)
+		})
+	} else {
+		window.engine.display.drawText(x + 1, y + 1, '(Empty)')
+	}
 }

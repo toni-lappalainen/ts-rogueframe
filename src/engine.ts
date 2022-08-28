@@ -1,14 +1,16 @@
 import * as ROT from 'rot-js'
 
-import { handleInput, handleLogInput, handleMouse } from './input-handler'
+import {
+	BaseInputHandler,
+	GameInputHandler,
+	InputState,
+	handleMouse,
+} from './input-handler'
+import { Action } from './actions/actions'
 import { Entity } from './entity'
 import { GameMap } from './map'
 import { generateDungeon } from './procgen'
-import {
-	renderFrameWithTitle,
-	renderHearts,
-	renderNamesAtLocation,
-} from './render'
+import { renderFrameWithTitle, renderHearts, renderInventory } from './render'
 import { MessageLog } from './messagelog'
 import { Colors } from './values'
 
@@ -21,17 +23,18 @@ export class Engine {
 	public static readonly MIN_ROOM_SIZE = 3
 	public static readonly MAX_ROOM_SIZE = 23
 	public static readonly MAX_MONSTERS_PER_ROOM = 2
+	public static readonly MAX_ITEMS_PER_ROOM = 2
 
 	display: ROT.Display
+	inputHandler: BaseInputHandler
 	gameMap: GameMap
 	player: Entity
 	messageLog: MessageLog
 	mousePosition: Point
-	_state: GameState
 	logCursorPosition: number
 
 	constructor(player: Entity) {
-		this._state = GameState.Game
+		this.inputHandler = new GameInputHandler()
 		this.logCursorPosition = 0
 		this.display = new ROT.Display({
 			width: Engine.WIDTH,
@@ -71,73 +74,37 @@ export class Engine {
 			Engine.MIN_ROOM_SIZE,
 			Engine.MAX_ROOM_SIZE,
 			Engine.MAX_MONSTERS_PER_ROOM,
+			Engine.MAX_ITEMS_PER_ROOM,
 			player,
 			this.display
 		)
 
 		this.player = player
 		this.gameMap.updateFov(this.player)
-	}
-	public get state() {
-		return this._state
-	}
-
-	public set state(value) {
-		this._state = value
-		this.logCursorPosition = this.messageLog.messages.length - 1
+		this.player.get('body').takeDamage(6)
 	}
 
 	handleEnemyTurns() {
-		this.gameMap.nonPlayerEntities.forEach((e) => {
-			console.log(
-				`The ${e.pos.x} wonders when it will get to take a real turn.`
-			)
+		this.gameMap.entities.forEach((e) => {
+			if (e.get('body').isAlive) {
+				try {
+					//e.ai?.perform(e)
+				} catch {}
+			}
 		})
 	}
 
-	processGameLoop(event: KeyboardEvent) {
-		if (this.player.get('body').hp > 0) {
-			const action = handleInput(event)
-
-			if (action) {
-				action.perform(this.player)
-
-				if (this.state === GameState.Game) {
-					this.handleEnemyTurns()
-				}
-			}
-		}
-
-		this.gameMap.updateFov(this.player)
-	}
-
-	processLogLoop(event: KeyboardEvent) {
-		const scrollAmount = handleLogInput(event)
-		if (scrollAmount < 0 && this.logCursorPosition === 0) {
-			this.logCursorPosition = this.messageLog.messages.length - 1
-		} else if (
-			scrollAmount > 0 &&
-			this.logCursorPosition === this.messageLog.messages.length - 1
-		) {
-			this.logCursorPosition = 0
-		} else {
-			this.logCursorPosition = Math.max(
-				0,
-				Math.min(
-					this.logCursorPosition + scrollAmount,
-					this.messageLog.messages.length - 1
-				)
-			)
-		}
-	}
-
 	update(event: KeyboardEvent) {
-		if (this.state === GameState.Game) {
-			this.processGameLoop(event)
-		} else if (this.state === GameState.Log) {
-			this.processLogLoop(event)
+		const action = this.inputHandler.handleKeyboardInput(event)
+		if (action instanceof Action) {
+			try {
+				action.perform(this.player)
+				this.handleEnemyTurns()
+				this.gameMap.updateFov(this.player)
+			} catch {}
 		}
 
+		this.inputHandler = this.inputHandler.nextHandler
 		this.render()
 	}
 
@@ -147,7 +114,7 @@ export class Engine {
 		renderHearts(this.display, 1, 47, 5)
 		this.gameMap.render()
 
-		if (this.state === GameState.Log) {
+		if (this.inputHandler.inputState === InputState.Log) {
 			renderFrameWithTitle(3, 3, 74, 38, 'Message Log')
 			this.messageLog.renderMessages(
 				this.display,
@@ -158,11 +125,11 @@ export class Engine {
 				this.messageLog.messages.slice(0, this.logCursorPosition + 1)
 			)
 		}
+		if (this.inputHandler.inputState === InputState.UseInventory) {
+			renderInventory('Select an item to use')
+		}
+		if (this.inputHandler.inputState === InputState.DropInventory) {
+			renderInventory('Select an item to drop')
+		}
 	}
-}
-export enum GameState {
-	Start,
-	Game,
-	Dead,
-	Log,
 }

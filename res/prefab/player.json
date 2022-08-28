@@ -11,6 +11,9 @@
 			"maxHP": 20,
 			"defense": 6,
 			"power": 6
+		},
+		"Inventory": {
+			"capacity": 24
 		}
 	}
 }

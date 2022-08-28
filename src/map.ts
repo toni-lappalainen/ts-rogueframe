@@ -29,6 +29,20 @@ export class GameMap {
 	public get nonPlayerEntities(): Entity[] {
 		return this.entities.filter((e) => e.name !== 'Player')
 	}
+	public get gameMap(): GameMap {
+		return this
+	}
+
+	public get items(): Entity[] {
+		return this.entities.filter((e) => e.has('item')) //.map((e) => e)
+	}
+
+	removeEntity(entity: Entity) {
+		const index = this.entities.indexOf(entity)
+		if (index >= 0) {
+			this.entities.splice(index, 1)
+		}
+	}
 
 	isInBounds(pos: Point) {
 		return 0 <= pos.x && pos.x < this.width && 0 <= pos.y && pos.y < this.height

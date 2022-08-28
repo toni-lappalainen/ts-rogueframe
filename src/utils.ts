@@ -2,6 +2,17 @@ export const generateRandomNumber = (min: number, max: number) => {
 	return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
+export const generateRandomPoint = (
+	minX: number,
+	maxX: number,
+	minY: number,
+	maxY: number
+): Point => {
+	const x = Math.floor(Math.random() * (maxX - minX + 1) + minX)
+	const y = Math.floor(Math.random() * (maxY - minY + 1) + minY)
+	return { x: x, y: y }
+}
+
 export const addXY = (p1: Point, p2: Point): Point => {
 	return { x: p1.x + p2.x, y: p1.y + p2.y }
 }

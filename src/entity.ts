@@ -1,5 +1,8 @@
 import { Colors } from './values'
-import { Component, componentList } from './components/component'
+import { Component } from './components/component'
+import { GameMap } from './map'
+import { componentList } from './components'
+import { Effect } from './components/effects'
 
 export enum RenderOrder {
 	Corpse,
@@ -18,14 +21,49 @@ export class Entity {
 		public bg: string = Colors.Black,
 		public blocksMovement: boolean = true,
 		public pos: Point = { x: 0, y: 0 },
+		public parent: GameMap | Component | null = null,
 		private components: Map<string, any> = new Map<string, any>() // FIXME: don't use any
 	) {
+		if (this.parent && this.parent instanceof GameMap) {
+			this.parent.entities.push(this)
+		}
 		this.char = char
 		this.pos = pos
 		this.fg = fg
 		this.bg = bg
 		this.id = crypto.randomUUID()
 	}
+
+	public get gameMap(): GameMap | undefined {
+		if (this.parent instanceof GameMap) return this.parent?.gameMap
+		else return undefined
+	}
+
+	update() {
+		this.components.forEach((value) => {
+			value.update()
+		})
+	}
+	place(pos: Point, gameMap: GameMap | undefined) {
+		this.pos = pos
+		if (gameMap) {
+			if (this.parent) {
+				if (this.parent === gameMap) {
+					gameMap.removeEntity(this)
+				}
+			}
+			this.parent = gameMap
+			gameMap.entities.push(this)
+		}
+	}
+
+	move(dir: Point) {
+		this.pos = dir
+		//this.pos.x += dir.x
+		//this.pos.y += dir.y
+	}
+
+	// Component methods
 
 	add = (cmps: Component[]) => {
 		for (let cmp of cmps) {
@@ -43,6 +81,14 @@ export class Entity {
 		}
 	}
 
+	getEffect = (): Effect | null => {
+		let component = null
+		this.components.forEach((cmp) => {
+			if (typeof cmp.activate === 'function') component = cmp
+		})
+		return component
+	}
+
 	get = (cmpClass: string) => {
 		return this.components.get(cmpClass)
 	}
@@ -50,16 +96,16 @@ export class Entity {
 	remove = (cmpClass: string) => {
 		this.components.delete(cmpClass)
 	}
-
-	move(dir: Point) {
-		this.pos.x += dir.x
-		this.pos.y += dir.y
-	}
 }
 
-export const spawnEntity = (data: any) => {
+export const spawnEntity = (
+	data: any,
+	map: GameMap | null = null,
+	position: Point | null = null
+) => {
 	const { name, char, renderOrder, fg, bg, blocksMovement, pos, components } =
 		data
+	const entityPos = position ? position : pos
 	const entity = new Entity(
 		name,
 		char,
@@ -67,14 +113,15 @@ export const spawnEntity = (data: any) => {
 		fg,
 		bg,
 		blocksMovement,
-		pos
+		entityPos,
+		map
 	)
 
 	const entityCmps = []
 	for (const [key, value] of Object.entries(components)) {
-		const cmp = componentList.find((c) => c.name === key)
+		const cmp: any = componentList.find((c) => c.name === key)
 		if (cmp) {
-			entityCmps.push(new cmp(...Object.values(value as number)))
+			entityCmps.push(new cmp(...Object.values(value as any)))
 		}
 	}
 	entity.add(entityCmps)

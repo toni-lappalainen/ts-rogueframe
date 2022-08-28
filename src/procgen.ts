@@ -2,8 +2,9 @@ import { FLOOR, WALL, Tile } from './tiles'
 import { GameMap } from './map'
 import { Display } from 'rot-js'
 import { Entity, spawnEntity } from './entity'
-import { generateRandomNumber } from './utils'
+import { generateRandomNumber, isEqual, generateRandomPoint } from './utils'
 import orcData from '../res/prefab/orc.json'
+import healshroom from '../res/prefab/items/healshroom.json'
 
 interface Bounds {
 	x1: number
@@ -95,19 +96,34 @@ function* connectRooms(
 const placeEntities = (
 	room: RectangularRoom,
 	dungeon: GameMap,
-	maxMonsters: number
+	maxMonsters: number,
+	maxItems: number
 ) => {
 	const numberOfMonstersToAdd = generateRandomNumber(0, maxMonsters)
+	const numberOfItemsToAdd = generateRandomNumber(0, maxItems)
+	const bounds = room.bounds
 
 	for (let i = 0; i < numberOfMonstersToAdd; i++) {
-		const bounds = room.bounds
-		const x = generateRandomNumber(bounds.x1 + 1, bounds.x2 - 1)
-		const y = generateRandomNumber(bounds.y1 + 1, bounds.y2 - 1)
+		const pos = generateRandomPoint(
+			bounds.x1 + 1,
+			bounds.x2 - 1,
+			bounds.y1 + 1,
+			bounds.y2 - 1
+		)
 
-		if (!dungeon.entities.some((e) => e.pos == { x, y })) {
-			const orc = spawnEntity(orcData)
-			orc.pos = { x: x, y: y }
-			dungeon.entities.push(spawnEntity(orc))
+		if (!dungeon.entities.some((e) => isEqual(e.pos, pos)))
+			spawnEntity(orcData, dungeon, pos)
+	}
+	for (let i = 0; i < numberOfItemsToAdd; i++) {
+		const pos = generateRandomPoint(
+			bounds.x1 + 1,
+			bounds.x2 - 1,
+			bounds.y1 + 1,
+			bounds.y2 - 1
+		)
+
+		if (!dungeon.entities.some((e) => isEqual(e.pos, pos))) {
+			spawnEntity(healshroom, dungeon, pos)
 		}
 	}
 }
@@ -119,6 +135,7 @@ export const generateDungeon = (
 	minSize: number,
 	maxSize: number,
 	maxMonsters: number,
+	maxItems: number,
 	player: Entity,
 	display: Display
 ): GameMap => {
@@ -141,7 +158,7 @@ export const generateDungeon = (
 
 		dungeon.addRoom(x, y, newRoom.tiles)
 
-		placeEntities(newRoom, dungeon, maxMonsters)
+		placeEntities(newRoom, dungeon, maxMonsters, maxItems)
 
 		rooms.push(newRoom)
 	}

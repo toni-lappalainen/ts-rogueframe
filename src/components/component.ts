@@ -1,8 +1,6 @@
 import { Entity } from '../entity'
-import { BodyCmp } from './body'
 
 export interface Component {
 	entity: Entity | null
+	update: () => void
 }
-
-export const componentList = [BodyCmp]
