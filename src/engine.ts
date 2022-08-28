@@ -1,10 +1,14 @@
 import * as ROT from 'rot-js'
 
-import { handleInput } from './input-handler'
+import { handleInput, handleLogInput, handleMouse } from './input-handler'
 import { Entity } from './entity'
 import { GameMap } from './map'
 import { generateDungeon } from './procgen'
-import { renderHearts, renderNamesAtLocation } from './render'
+import {
+	renderFrameWithTitle,
+	renderHearts,
+	renderNamesAtLocation,
+} from './render'
 import { MessageLog } from './messagelog'
 import { Colors } from './values'
 
@@ -23,8 +27,12 @@ export class Engine {
 	player: Entity
 	messageLog: MessageLog
 	mousePosition: Point
+	_state: GameState
+	logCursorPosition: number
 
 	constructor(player: Entity) {
+		this._state = GameState.Game
+		this.logCursorPosition = 0
 		this.display = new ROT.Display({
 			width: Engine.WIDTH,
 			height: Engine.HEIGHT,
@@ -48,7 +56,12 @@ export class Engine {
 				x: this.display.eventToPosition(event)[0],
 				y: this.display.eventToPosition(event)[1],
 			}
+			//this.render()
+		})
+		window.addEventListener('click', (event) => {
+			//TODO: make better render system that takes all the drawed stuff and then renders them.
 			this.render()
+			handleMouse(event, this.mousePosition)
 		})
 
 		this.gameMap = generateDungeon(
@@ -65,6 +78,14 @@ export class Engine {
 		this.player = player
 		this.gameMap.updateFov(this.player)
 	}
+	public get state() {
+		return this._state
+	}
+
+	public set state(value) {
+		this._state = value
+		this.logCursorPosition = this.messageLog.messages.length - 1
+	}
 
 	handleEnemyTurns() {
 		this.gameMap.nonPlayerEntities.forEach((e) => {
@@ -74,16 +95,49 @@ export class Engine {
 		})
 	}
 
-	update(event: KeyboardEvent) {
-		const action = handleInput(event)
+	processGameLoop(event: KeyboardEvent) {
+		if (this.player.get('body').hp > 0) {
+			const action = handleInput(event)
 
-		if (action) {
-			action.perform(this.player)
-			console.log(this.player.pos)
-			this.handleEnemyTurns()
+			if (action) {
+				action.perform(this.player)
+
+				if (this.state === GameState.Game) {
+					this.handleEnemyTurns()
+				}
+			}
 		}
 
 		this.gameMap.updateFov(this.player)
+	}
+
+	processLogLoop(event: KeyboardEvent) {
+		const scrollAmount = handleLogInput(event)
+		if (scrollAmount < 0 && this.logCursorPosition === 0) {
+			this.logCursorPosition = this.messageLog.messages.length - 1
+		} else if (
+			scrollAmount > 0 &&
+			this.logCursorPosition === this.messageLog.messages.length - 1
+		) {
+			this.logCursorPosition = 0
+		} else {
+			this.logCursorPosition = Math.max(
+				0,
+				Math.min(
+					this.logCursorPosition + scrollAmount,
+					this.messageLog.messages.length - 1
+				)
+			)
+		}
+	}
+
+	update(event: KeyboardEvent) {
+		if (this.state === GameState.Game) {
+			this.processGameLoop(event)
+		} else if (this.state === GameState.Log) {
+			this.processLogLoop(event)
+		}
+
 		this.render()
 	}
 
@@ -92,6 +146,23 @@ export class Engine {
 		this.messageLog.render(this.display, 21, 45, 40, 5)
 		renderHearts(this.display, 1, 47, 5)
 		this.gameMap.render()
-		renderNamesAtLocation(1, 44)
+
+		if (this.state === GameState.Log) {
+			renderFrameWithTitle(3, 3, 74, 38, 'Message Log')
+			this.messageLog.renderMessages(
+				this.display,
+				4,
+				4,
+				72,
+				36,
+				this.messageLog.messages.slice(0, this.logCursorPosition + 1)
+			)
+		}
 	}
+}
+export enum GameState {
+	Start,
+	Game,
+	Dead,
+	Log,
 }
