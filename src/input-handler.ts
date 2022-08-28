@@ -149,9 +149,10 @@ export class InventoryInputHandler extends BaseInputHandler {
 			if (index >= 0 && index <= 26) {
 				const item = window.engine.player.get('inventory').items[index]
 				if (item) {
+					console.log(item)
 					this.nextHandler = new GameInputHandler()
 					if (this.inputState === InputState.UseInventory) {
-						return item.consumable.getAction()
+						return item.getEffect().getAction()
 					} else if (this.inputState === InputState.DropInventory) {
 						return new DropItem(item)
 					}
