@@ -1,8 +1,8 @@
 {
-	"name": "Green mushroom",
+	"name": "Lightning mushroom",
 	"char": "M",
 	"renderOrder": 2,
-	"fg": "#FFF",
+	"fg": "#323296",
 	"bg": "#000",
 	"blocksMovement": false,
 	"canAct": false,
@@ -12,8 +12,8 @@
 			"weight": 1,
 			"consumable": true
 		},
-		"Healing": {
-			"amount": 5
+		"Lightning": {
+			"damage": 5
 		}
 	}
 }

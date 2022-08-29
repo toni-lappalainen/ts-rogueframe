@@ -47,7 +47,7 @@ export class MeleeAction extends ActionWithDirection {
 			throw new Error('Nothing to attack.')
 		}
 		window.engine.messageLog.addMessage(
-			`${entity.name} kick the ${target.name}, much to its annoyance!`
+			`${entity.name} kicks the ${target.name}, much to its annoyance!`
 		)
 	}
 }

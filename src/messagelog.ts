@@ -70,7 +70,7 @@ export class MessageLog {
 			}
 
 			for (let line of lines) {
-				const text = `%c{${msg.fg}}${line}`
+				const text = `%c{${Colors.White}}${line}`
 				display.drawText(x, y + yOffset, text, width)
 				yOffset -= 1
 				if (yOffset < 0) return

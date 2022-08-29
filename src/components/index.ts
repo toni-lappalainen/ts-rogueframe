@@ -1,7 +1,8 @@
 import { BodyCmp } from './body'
-import { Healing, Effect } from './effects'
+import { Healing, Lightning } from './effects'
 import { Item } from './Item'
 import { Inventory } from './inventory'
+import {} from 'rot-js'
 
 export type CmpTypes = InstanceType<typeof componentList[number]>
 
@@ -13,10 +14,10 @@ type WithOptionalSignature = {
 	body?: BodyCmp
 	inventory?: Inventory
 	item?: Item
-	//Effect?: Effect
 	healing?: Healing
+	lightning?: Lightning
 }
 
 export type cmpList = WithRequiredSignature & WithOptionalSignature
 
-export const componentList = [BodyCmp, Inventory, Item, Healing]
+export const componentList = [BodyCmp, Inventory, Item, Healing, Lightning]

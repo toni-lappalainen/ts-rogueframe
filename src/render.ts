@@ -28,10 +28,18 @@ export const renderHearts = (
 }
 
 export const renderNamesAtLocation = (pos: Point, entities: Entity[]) => {
+	let width = 21
 	const names = entities
 		.map((e) => e.name.charAt(0).toUpperCase() + e.name.substring(1))
 		.join(', ')
-	renderFrameWithTitle(pos.x - 3, pos.y - 3, 20, 20, names)
+	if (names.length > width - 4) width = names.length + 4
+	renderFrameWithTitle(pos.x + 1, pos.y - 3, width, 12, names)
+	window.engine.display.drawText(
+		pos.x + 3,
+		pos.y - 1,
+		`%b{${Colors.Primary}}${entities[0].description}`,
+		16
+	)
 }
 
 export const renderFrameWithTitle = (
@@ -49,7 +57,7 @@ export const renderFrameWithTitle = (
 	const horizontal = '─'
 	const leftTitle = '┤'
 	const rightTitle = '├'
-	const empty = ' '
+	const empty = `%b{${Colors.Primary}} `
 
 	const innerWidth = width - 2
 	const innerHeight = height - 2
@@ -60,18 +68,26 @@ export const renderFrameWithTitle = (
 		topLeft +
 		horizontal.repeat(left) +
 		leftTitle +
-		title +
+		`%c{${Colors.BrownYellow}}${title}` +
+		'%c{}' +
 		rightTitle +
 		horizontal.repeat(remainingAfterTitle - left) +
 		topRight
-	const middleRow = vertical + empty.repeat(innerWidth) + vertical
+	const middleRow =
+		`%b{${Colors.Secondary}}${vertical}` +
+		empty.repeat(innerWidth) +
+		`%b{${Colors.Secondary}}${vertical}`
 	const bottomRow = bottomLeft + horizontal.repeat(innerWidth) + bottomRight
 
-	window.engine.display.drawText(x, y, topRow)
+	window.engine.display.drawText(x, y, `%b{${Colors.Secondary}}${topRow}`)
 	for (let i = 1; i <= innerHeight; i++) {
 		window.engine.display.drawText(x, y + i, middleRow)
 	}
-	window.engine.display.drawText(x, y + height - 1, bottomRow)
+	window.engine.display.drawText(
+		x,
+		y + height - 1,
+		`%b{${Colors.Secondary}}${bottomRow}`
+	)
 }
 
 export const renderInventory = (title: string) => {

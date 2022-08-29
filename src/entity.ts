@@ -15,6 +15,7 @@ export class Entity {
 	readonly id: string
 	constructor(
 		public name: string = '<Unnamed>',
+		public description: string = `It is a ${name}.`,
 		public char: string = ' ',
 		public renderOrder: RenderOrder = RenderOrder.Corpse,
 		public fg: string = Colors.White,
@@ -108,6 +109,7 @@ export const spawnEntity = (
 ) => {
 	const {
 		name,
+		description,
 		char,
 		renderOrder,
 		fg,
@@ -120,6 +122,7 @@ export const spawnEntity = (
 	const entityPos = position ? position : pos
 	const entity = new Entity(
 		name,
+		description,
 		char,
 		renderOrder,
 		fg,

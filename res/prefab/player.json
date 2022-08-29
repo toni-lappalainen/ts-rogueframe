@@ -1,5 +1,6 @@
 {
-	"name": "Player",
+	"name": "WinDGeisT",
+	"description": "The mighty Mycomancer,\nSurveyor of the Holy sound waves.",
 	"char": "@",
 	"renderOrder": 3,
 	"fg": "#FFF",

@@ -34,6 +34,7 @@ export enum InputState {
 	Log,
 	UseInventory,
 	DropInventory,
+	Target,
 }
 
 export abstract class BaseInputHandler {
@@ -141,6 +142,7 @@ export class InventoryInputHandler extends BaseInputHandler {
 
 			if (index >= 0 && index <= 26) {
 				const item = window.engine.player.cmp.inventory?.items[index]
+				console.log(item)
 				if (item) {
 					this.nextHandler = new GameInputHandler()
 					if (this.inputState === InputState.UseInventory) {
