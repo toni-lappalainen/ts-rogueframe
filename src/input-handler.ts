@@ -1,4 +1,5 @@
 import { Entity } from './entity'
+import { Engine } from './engine'
 import { addXY, isEqual } from './utils'
 import { renderNamesAtLocation } from './render'
 import { Colors } from './values'
@@ -9,6 +10,7 @@ import {
 	PickupAction,
 	WaitAction,
 } from './actions/actions'
+import { Display } from 'rot-js'
 
 interface MovementMap {
 	[key: string]: Action
@@ -27,6 +29,12 @@ const LOG_KEYS: LogMap = {
 interface DirectionMap {
 	[key: string]: Point
 }
+const MOVE_KEYS: DirectionMap = {
+	ArrowUp: { x: 0, y: -1 },
+	ArrowDown: { x: 0, y: 1 },
+	ArrowLeft: { x: -1, y: 0 },
+	ArrowRight: { x: 1, y: 0 },
+}
 
 export enum InputState {
 	Game,
@@ -39,32 +47,33 @@ export enum InputState {
 
 export abstract class BaseInputHandler {
 	nextHandler: BaseInputHandler
+	mousePosition: Point
+	//logCursorPosition: number
 	protected constructor(public inputState: InputState = InputState.Game) {
 		this.nextHandler = this
+		this.mousePosition = { x: 0, y: 0 }
+		//this.logCursorPosition = window.engine.messageLog.messages.length - 1
 	}
 
 	abstract handleKeyboardInput(event: KeyboardEvent): Action | null
+	handleMouseMovement(position: Point) {
+		this.mousePosition = position
+	}
+	onRender(_display: Display) {}
 }
 
 export class GameInputHandler extends BaseInputHandler {
-	MOVE_KEYS: DirectionMap
 	constructor() {
 		super()
-		this.MOVE_KEYS = {
-			ArrowUp: { x: 0, y: -1 },
-			ArrowDown: { x: 0, y: 1 },
-			ArrowLeft: { x: -1, y: 0 },
-			ArrowRight: { x: 1, y: 0 },
-		}
 	}
 
 	handleKeyboardInput(event: KeyboardEvent): Action | null {
 		if (window.engine.player.cmp.body?.isAlive) {
-			if (event.key in this.MOVE_KEYS) {
-				const dir = this.MOVE_KEYS[event.key]
+			if (event.key in MOVE_KEYS) {
+				const dir = MOVE_KEYS[event.key]
 				return new BumpAction(dir)
 			}
-			if (event.key === 'l') {
+			if (event.key === 'm') {
 				this.nextHandler = new LogInputHandler()
 			}
 			if (event.key === '5' || event.key === '.') {
@@ -78,6 +87,9 @@ export class GameInputHandler extends BaseInputHandler {
 			}
 			if (event.key === 'd') {
 				this.nextHandler = new InventoryInputHandler(InputState.DropInventory)
+			}
+			if (event.key === 'l') {
+				this.nextHandler = new LookHandler()
 			}
 		}
 
@@ -184,5 +196,55 @@ export const handleMouse = (event: MouseEvent, pos: Point = { x: 0, y: 0 }) => {
 			)
 			if (entities.length) renderNamesAtLocation(pos, entities)
 		}
+	}
+}
+export abstract class SelectIndexHandler extends BaseInputHandler {
+	protected constructor() {
+		super(InputState.Target)
+		const x = window.engine.player.pos.x
+		const y = window.engine.player.pos.y
+		this.mousePosition = { x: x, y: y }
+	}
+
+	handleKeyboardInput(event: KeyboardEvent): Action | null {
+		if (event.key in MOVE_KEYS) {
+			const moveAmount = MOVE_KEYS[event.key]
+			let modifier = 1
+			if (event.shiftKey) modifier = 5
+			if (event.ctrlKey) modifier = 10
+			if (event.altKey) modifier = 20
+
+			let x = this.mousePosition.x
+			let y = this.mousePosition.y
+			let dx = moveAmount.x
+			let dy = moveAmount.y
+			console.log(x, y, dx, dy)
+			x += dx * modifier
+			y += dy * modifier
+			console.log(x, y, dx, dy)
+			x = Math.max(0, Math.min(x * modifier, Engine.MAP_WIDTH - 1))
+			y = Math.max(0, Math.min(y * modifier, Engine.MAP_HEIGHT - 1))
+			console.log(x, y, dx, dy)
+			this.mousePosition = { x: x, y: y }
+			return null
+		} else if (event.key === 'Enter') {
+			return this.onIndexSelected()
+		}
+
+		this.nextHandler = new GameInputHandler()
+		return null
+	}
+
+	abstract onIndexSelected(): Action | null
+}
+
+export class LookHandler extends SelectIndexHandler {
+	constructor() {
+		super()
+	}
+
+	onIndexSelected(): Action | null {
+		this.nextHandler = new GameInputHandler()
+		return null
 	}
 }
