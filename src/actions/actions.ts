@@ -80,7 +80,7 @@ export class DropItem extends ItemAction {
 	perform(entity: Entity) {
 		const dropper = entity
 		if (!dropper) return
-		dropper.get('inventory').drop(this.item)
+		dropper.cmp.inventory?.drop(this.item)
 	}
 }
 
@@ -90,7 +90,8 @@ export class PickupAction extends Action {
 		if (!consumer) return
 
 		const pos = consumer.pos
-		const inventory = consumer.get('inventory')
+		const inventory = consumer.cmp.inventory
+		if (!inventory) return
 
 		for (const item of window.engine.gameMap.items) {
 			if (isEqual(pos, item.pos)) {

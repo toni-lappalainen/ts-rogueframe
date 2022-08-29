@@ -76,7 +76,8 @@ export const renderFrameWithTitle = (
 
 export const renderInventory = (title: string) => {
 	const player = window.engine.player
-	const inventory: Inventory = player.get('inventory')
+	const inventory = player.cmp.inventory
+	if (!inventory) return
 	const itemCount = inventory.items.length
 	const height = itemCount + 2 <= 3 ? 3 : itemCount + 2
 	const width = title.length + 12

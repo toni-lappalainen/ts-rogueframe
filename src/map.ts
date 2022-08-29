@@ -33,6 +33,10 @@ export class GameMap {
 		return this
 	}
 
+	public get actors(): Entity[] {
+		return this.entities.filter((e) => e.canAct)
+	}
+
 	public get items(): Entity[] {
 		return this.entities.filter((e) => e.has('item')) //.map((e) => e)
 	}

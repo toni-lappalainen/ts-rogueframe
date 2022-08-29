@@ -20,3 +20,7 @@ export const addXY = (p1: Point, p2: Point): Point => {
 export const isEqual = (p1: Point, p2: Point) => {
 	return JSON.stringify(p1) === JSON.stringify(p2)
 }
+
+export const getDistance = (pos1: Point, pos2: Point) => {
+	return Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
+}

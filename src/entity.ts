@@ -1,7 +1,7 @@
 import { Colors } from './values'
 import { Component } from './components/component'
 import { GameMap } from './map'
-import { componentList } from './components'
+import { componentList, CmpTypes, cmpList } from './components'
 import { Effect } from './components/effects'
 
 export enum RenderOrder {
@@ -20,9 +20,10 @@ export class Entity {
 		public fg: string = Colors.White,
 		public bg: string = Colors.Black,
 		public blocksMovement: boolean = true,
+		public canAct: boolean = true,
 		public pos: Point = { x: 0, y: 0 },
 		public parent: GameMap | Component | null = null, //Map<string, any> = new Map<string, any>() // FIXME: don't use any
-		private components: any = {}
+		public cmp: cmpList = {}
 	) {
 		if (this.parent && this.parent instanceof GameMap) {
 			this.parent.entities.push(this)
@@ -40,7 +41,7 @@ export class Entity {
 	}
 
 	update() {
-		for (const cmp of Object.values(this.components) as any) {
+		for (const cmp of Object.values(this.cmp) as any) {
 			cmp.update()
 		}
 	}
@@ -60,22 +61,20 @@ export class Entity {
 
 	move(dir: Point) {
 		this.pos = dir
-		//this.pos.x += dir.x
-		//this.pos.y += dir.y
 	}
 
 	// Component methods
 
-	add = (cmps: Component[]) => {
+	add = (cmps: CmpTypes[]) => {
 		for (let cmp of cmps) {
 			cmp.entity = this
 			const name = cmp.constructor.name.replace('Cmp', '').toLowerCase()
-			this.components[name] = cmp
+			this.cmp[name] = cmp
 		}
 	}
 
 	has = (cmpClass: string) => {
-		if (this.components[cmpClass.toLowerCase()] !== undefined) return true
+		if (this.cmp[cmpClass.toLowerCase()] !== undefined) return true
 		else {
 			console.log(`Component ${cmpClass} not found on ${this.name}`)
 			return false
@@ -84,18 +83,21 @@ export class Entity {
 
 	getEffect = (): Effect | null => {
 		let component = null
-		for (const [key, value] of Object.entries(this.components) as any) {
-			if (typeof value.activate === 'function') component = value
+		for (const [key, value] of Object.entries(this.cmp) as [
+			string,
+			CmpTypes
+		][]) {
+			if (value instanceof Effect) component = value
 		}
 		return component
 	}
 
 	get = (cmpClass: string) => {
-		return this.components[cmpClass]
+		return this.cmp[`${cmpClass}`] as CmpTypes
 	}
 
 	remove = (cmpClass: string) => {
-		delete this.components.delete[cmpClass]
+		delete this.cmp[`${cmpClass}`]
 	}
 }
 
@@ -104,8 +106,17 @@ export const spawnEntity = (
 	map: GameMap | null = null,
 	position: Point | null = null
 ) => {
-	const { name, char, renderOrder, fg, bg, blocksMovement, pos, components } =
-		data
+	const {
+		name,
+		char,
+		renderOrder,
+		fg,
+		bg,
+		blocksMovement,
+		canAct,
+		pos,
+		components,
+	} = data
 	const entityPos = position ? position : pos
 	const entity = new Entity(
 		name,
@@ -114,6 +125,7 @@ export const spawnEntity = (
 		fg,
 		bg,
 		blocksMovement,
+		canAct,
 		entityPos,
 		map
 	)
@@ -125,8 +137,8 @@ export const spawnEntity = (
 			entityCmps.push(new cmp(...Object.values(value as any)))
 		}
 	}
-	entity.add(entityCmps)
 
+	entity.add(entityCmps)
 	return entity
 }
 

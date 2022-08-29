@@ -45,13 +45,6 @@ export abstract class BaseInputHandler {
 	abstract handleKeyboardInput(event: KeyboardEvent): Action | null
 }
 
-/*
-	l: new LogAction(),
-	g: new PickupAction(),
-	i: new InventoryAction(true),
-	d: new InventoryAction(false),
-	*/
-
 export class GameInputHandler extends BaseInputHandler {
 	MOVE_KEYS: DirectionMap
 	constructor() {
@@ -65,7 +58,7 @@ export class GameInputHandler extends BaseInputHandler {
 	}
 
 	handleKeyboardInput(event: KeyboardEvent): Action | null {
-		if (window.engine.player.get('body').isAlive) {
+		if (window.engine.player.cmp.body?.isAlive) {
 			if (event.key in this.MOVE_KEYS) {
 				const dir = this.MOVE_KEYS[event.key]
 				return new BumpAction(dir)
@@ -147,12 +140,12 @@ export class InventoryInputHandler extends BaseInputHandler {
 			const index = ordinal - 'a'.charCodeAt(0)
 
 			if (index >= 0 && index <= 26) {
-				const item = window.engine.player.get('inventory').items[index]
+				const item = window.engine.player.cmp.inventory?.items[index]
 				if (item) {
-					console.log(item)
 					this.nextHandler = new GameInputHandler()
 					if (this.inputState === InputState.UseInventory) {
-						return item.getEffect().getAction()
+						const action = item.getEffect()?.getAction()
+						if (action) return action
 					} else if (this.inputState === InputState.DropInventory) {
 						return new DropItem(item)
 					}

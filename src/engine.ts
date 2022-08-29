@@ -81,12 +81,12 @@ export class Engine {
 
 		this.player = player
 		this.gameMap.updateFov(this.player)
-		this.player.get('body').takeDamage(6)
+		//	this.player.get('body').takeDamage(6)
 	}
 
 	handleEnemyTurns() {
-		this.gameMap.entities.forEach((e) => {
-			if (e.get('body').isAlive) {
+		this.gameMap.actors.forEach((e) => {
+			if (e.cmp.body?.isAlive) {
 				try {
 					//e.ai?.perform(e)
 				} catch {}
