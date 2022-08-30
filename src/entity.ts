@@ -24,6 +24,7 @@ export class Entity {
 		public canAct: boolean = true,
 		public pos: Point = { x: 0, y: 0 },
 		public parent: GameMap | Component | null = null, //Map<string, any> = new Map<string, any>() // FIXME: don't use any
+		id: string | null = null,
 		public cmp: cmpList = {}
 	) {
 		if (this.parent && this.parent instanceof GameMap) {
@@ -33,7 +34,7 @@ export class Entity {
 		this.pos = pos
 		this.fg = fg
 		this.bg = bg
-		this.id = crypto.randomUUID()
+		this.id = id ? id : crypto.randomUUID()
 	}
 
 	public get gameMap(): GameMap | undefined {
@@ -77,7 +78,7 @@ export class Entity {
 	has = (cmpClass: string) => {
 		if (this.cmp[cmpClass.toLowerCase()] !== undefined) return true
 		else {
-			console.log(`Component ${cmpClass} not found on ${this.name}`)
+			//console.log(`Component ${cmpClass} not found on ${this.name}`)
 			return false
 		}
 	}
@@ -117,9 +118,12 @@ export const spawnEntity = (
 		blocksMovement,
 		canAct,
 		pos,
+		id,
 		components,
 	} = data
 	const entityPos = position ? position : pos
+	const _id = id ? id : null
+	const entityCmps = []
 	const entity = new Entity(
 		name,
 		description,
@@ -130,10 +134,9 @@ export const spawnEntity = (
 		blocksMovement,
 		canAct,
 		entityPos,
-		map
+		map,
+		_id
 	)
-
-	const entityCmps = []
 	for (const [key, value] of Object.entries(components)) {
 		const cmp: any = componentList.find((c) => c.name === key)
 		if (cmp) {
@@ -142,18 +145,14 @@ export const spawnEntity = (
 	}
 
 	entity.add(entityCmps)
+	console.log(entity.id)
 	return entity
 }
 
-const serializeEntity = (entity: Entity) => {
+export const serializeEntity = (entity: Entity) => {
 	return JSON.stringify(entity, (key, value) => {
-		console.log(value)
-		if (key === 'entity') return value.id
-		if (value instanceof Map) {
-			return {
-				dataType: 'Map',
-				value: Array.from(value.entries()),
-			}
-		} else return value
+		if (key === 'parent' && value) return value.id
+		if (key === 'entity' && value) return value.id
+		else return value
 	})
 }

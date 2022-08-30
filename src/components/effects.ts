@@ -106,7 +106,7 @@ export class Fireball extends Effect {
 
 	getAction(): Action | null {
 		window.msgLog.addMessage('Select a target location.', Colors.Yellow)
-		window.engine.inputHandler = new AreaRangedAttackHandler(
+		window.engine.screen.inputHandler = new AreaRangedAttackHandler(
 			this.radius,
 			(pos) => {
 				return new ItemAction(this.entity, pos)

@@ -9,6 +9,7 @@ import {
 import { Entity, spawnEntity } from './entity'
 import { BaseScreen } from './screens/screen'
 import { GameScreen } from './screens/gamescreen'
+import { MainMenu } from './screens/mainmenu'
 
 export class Engine {
 	public static readonly WIDTH = 80
@@ -52,10 +53,14 @@ export class Engine {
 			//handleMouse(event, this.inputHandler.mousePosition)
 		})
 
-		this.screen = new GameScreen(this.display, this.player)
+		this.screen = new MainMenu(this.display, this.player)
 	}
 
 	update(event: KeyboardEvent) {
 		const screen = this.screen.update(event)
+		if (!Object.is(screen, this.screen)) {
+			this.screen = screen
+			this.screen.render()
+		}
 	}
 }

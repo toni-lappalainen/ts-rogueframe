@@ -1,4 +1,4 @@
-import { FLOOR, WALL, Tile } from './tiles'
+import { FLOOR, WALL, Tile, STAIRS_DOWN } from './tiles'
 import { GameMap } from './map'
 import { Display } from 'rot-js'
 import { Entity, spawnEntity } from './entity'
@@ -146,7 +146,7 @@ export const generateDungeon = (
 ): GameMap => {
 	const dungeon = new GameMap(mapWidth, mapHeight, display, [player])
 	const rooms: RectangularRoom[] = []
-
+	let centerOfLastRoom: Point = { x: 0, y: 0 }
 	// create rooms
 	for (let count = 0; count < maxRooms; count++) {
 		const width = generateRandomNumber(minSize, maxSize)
@@ -166,6 +166,7 @@ export const generateDungeon = (
 		placeEntities(newRoom, dungeon, maxMonsters, maxItems)
 
 		rooms.push(newRoom)
+		centerOfLastRoom = { x: newRoom.center[0], y: newRoom.center[1] }
 	}
 
 	//creata player starting point
@@ -181,6 +182,10 @@ export const generateDungeon = (
 			dungeon.tiles[tile[1]][tile[0]] = { ...FLOOR }
 		}
 	}
+	dungeon.tiles[centerOfLastRoom.y][centerOfLastRoom.x] = {
+		...STAIRS_DOWN,
+	}
+	dungeon.downstairsLocation = centerOfLastRoom
 
 	return dungeon
 }

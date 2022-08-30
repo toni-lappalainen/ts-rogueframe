@@ -10,7 +10,7 @@ import { Entity } from '../entity'
 import { GameMap } from '../map'
 import { generateDungeon } from '../procgen'
 import { renderFrameWithTitle, renderHearts, renderInventory } from '../render'
-import { MessageLog, ImpossibleException } from '../messagelog'
+import { ImpossibleException } from '../messagelog'
 import { Colors } from '../values'
 import { BaseScreen } from './screen'
 
@@ -24,10 +24,22 @@ export class GameScreen extends BaseScreen {
 	public static readonly MAX_ITEMS_PER_ROOM = 2
 
 	inputHandler: BaseInputHandler
-	gameMap: GameMap
+	gameMap!: GameMap
 
-	constructor(display: Display, player: Entity) {
+	constructor(
+		display: Display,
+		player: Entity,
+		public currentFloor: number = 0
+	) {
 		super(display, player)
+		this.generateFloor()
+
+		this.inputHandler = new GameInputHandler()
+		this.gameMap.updateFov(this.player)
+		//	this.player.get('body').takeDamage(6)
+	}
+	generateFloor(): void {
+		this.currentFloor += 1
 
 		this.gameMap = generateDungeon(
 			GameScreen.MAP_WIDTH,
@@ -40,10 +52,6 @@ export class GameScreen extends BaseScreen {
 			this.player,
 			this.display
 		)
-
-		this.inputHandler = new GameInputHandler()
-		this.gameMap.updateFov(this.player)
-		//	this.player.get('body').takeDamage(6)
 	}
 
 	handleEnemyTurns() {
@@ -71,13 +79,17 @@ export class GameScreen extends BaseScreen {
 		}
 
 		this.inputHandler = this.inputHandler.nextHandler
+
 		this.render()
+		return this
 	}
 
 	render() {
 		this.display.clear()
 		window.msgLog.render(this.display, 21, 45, 40, 5)
 		renderHearts(this.display, 1, 47, 5)
+
+		this.display.drawText(0, 47, `Dungeon level: ${this.currentFloor}`)
 		this.gameMap.render()
 
 		if (this.inputHandler.inputState === InputState.Log) {

@@ -15,6 +15,15 @@ export interface Tile {
 	light: Graphic
 }
 
+export const STAIRS_DOWN: Tile = {
+	walkable: true,
+	transparent: true,
+	visible: false,
+	seen: false,
+	dark: { char: '>', fg: Colors.Gray, bg: Colors.Black },
+	light: { char: '>', fg: Colors.White, bg: Colors.Black },
+}
+
 export const FLOOR: Tile = {
 	walkable: true,
 	transparent: true,

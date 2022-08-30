@@ -8,6 +8,7 @@ import {
 	BumpAction,
 	DropItem,
 	PickupAction,
+	TakeStairsAction,
 	WaitAction,
 } from './actions/actions'
 import { Display } from 'rot-js'
@@ -91,6 +92,9 @@ export class GameInputHandler extends BaseInputHandler {
 			}
 			if (event.key === 'l') {
 				this.nextHandler = new LookHandler()
+			}
+			if (event.key === '>') {
+				return new TakeStairsAction()
 			}
 		}
 

@@ -1,7 +1,8 @@
-import { Entity } from '../entity'
+import { Entity, serializeEntity } from '../entity'
 import { addXY, isEqual } from '../utils'
 import { ImpossibleException } from '../messagelog'
 import { GameMap } from '../map'
+import { Colors } from '../values'
 
 export abstract class Action {
 	abstract perform(entity: Entity, gameMap: GameMap): void
@@ -59,6 +60,17 @@ export class BumpAction extends ActionWithDirection {
 	}
 }
 
+export class TakeStairsAction extends Action {
+	perform(entity: Entity, gameMap: GameMap) {
+		if (isEqual(entity.pos, gameMap.downstairsLocation)) {
+			window.engine.screen.generateFloor()
+			window.msgLog.addMessage('You descend the staircase.', Colors.BrownLight)
+		} else {
+			throw new ImpossibleException('There are no stairs here.')
+		}
+	}
+}
+
 export class ItemAction extends Action {
 	constructor(
 		public item: Entity | null,
@@ -109,6 +121,7 @@ export class PickupAction extends Action {
 				inventory.items.push(item)
 
 				window.msgLog.addMessage(`You picked up the ${item.name}!`)
+
 				return
 			}
 		}

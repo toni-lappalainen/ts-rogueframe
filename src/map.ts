@@ -6,8 +6,23 @@ import { Display } from 'rot-js'
 import { Colors } from './values'
 import { isEqual } from './utils'
 
+export const serializeMap = (map: GameMap) => {
+	const entityList: string[] = []
+	map.entities.forEach((entity) => {
+		entityList.push(entity.id)
+	})
+
+	return JSON.stringify(map, (key, value) => {
+		if (key === 'display') return
+		if (key === 'entities') return entityList
+		else return value
+	})
+}
+
 export class GameMap {
+	readonly id: string
 	tiles: Tile[][]
+	downstairsLocation: Point
 	public static readonly FOV_RADIUS = 20
 
 	constructor(
@@ -16,6 +31,7 @@ export class GameMap {
 		public display: Display,
 		public entities: [Entity]
 	) {
+		this.id = crypto.randomUUID()
 		this.tiles = new Array(this.height)
 		for (let y = 0; y < this.height; y++) {
 			const row = new Array(this.width)
@@ -24,6 +40,7 @@ export class GameMap {
 			}
 			this.tiles[y] = row
 		}
+		this.downstairsLocation = { x: 0, y: 0 }
 	}
 
 	public get nonPlayerEntities(): Entity[] {
