@@ -1,0 +1,20 @@
+{
+	"name": "Fireball mushroom",
+	"char": "M",
+	"renderOrder": 2,
+	"fg": "#DBCD7B",
+	"bg": "#000",
+	"blocksMovement": false,
+	"canAct": false,
+	"pos": { "x": 0, "y": 0 },
+	"components": {
+		"Item": {
+			"weight": 1,
+			"consumable": true
+		},
+		"Fireball": {
+			"damage": 6,
+			"radius": 2
+		}
+	}
+}

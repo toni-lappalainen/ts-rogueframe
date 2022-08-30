@@ -11,7 +11,7 @@ import { Entity } from './entity'
 import { GameMap } from './map'
 import { generateDungeon } from './procgen'
 import { renderFrameWithTitle, renderHearts, renderInventory } from './render'
-import { MessageLog } from './messagelog'
+import { MessageLog, ImpossibleException } from './messagelog'
 import { Colors } from './values'
 
 export class Engine {
@@ -101,7 +101,11 @@ export class Engine {
 				action.perform(this.player)
 				this.handleEnemyTurns()
 				this.gameMap.updateFov(this.player)
-			} catch {}
+			} catch (error) {
+				if (error instanceof ImpossibleException) {
+					this.messageLog.addMessage(error.message, Colors.Gray)
+				}
+			}
 		}
 
 		this.inputHandler = this.inputHandler.nextHandler
@@ -137,5 +141,6 @@ export class Engine {
 			const char = data ? data[2] || ' ' : ' '
 			this.display.drawOver(x, y, char[0], '#000', '#fff')
 		}
+		this.inputHandler.onRender(this.display)
 	}
 }

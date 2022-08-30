@@ -88,3 +88,7 @@ export class MessageLog {
 		this.renderMessages(display, x, y, width, height, this.messages)
 	}
 }
+
+export class ImpossibleException {
+	constructor(public message: string) {}
+}

@@ -1,5 +1,5 @@
 import { BodyCmp } from './body'
-import { Healing, Lightning } from './effects'
+import { Fireball, Healing, Lightning } from './effects'
 import { Item } from './Item'
 import { Inventory } from './inventory'
 import {} from 'rot-js'
@@ -16,8 +16,16 @@ type WithOptionalSignature = {
 	item?: Item
 	healing?: Healing
 	lightning?: Lightning
+	fireball?: Fireball
 }
 
 export type cmpList = WithRequiredSignature & WithOptionalSignature
 
-export const componentList = [BodyCmp, Inventory, Item, Healing, Lightning]
+export const componentList = [
+	BodyCmp,
+	Inventory,
+	Item,
+	Healing,
+	Lightning,
+	Fireball,
+]

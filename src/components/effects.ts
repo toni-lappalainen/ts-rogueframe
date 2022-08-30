@@ -4,6 +4,8 @@ import { Colors } from '../values'
 import { getDistance } from '../utils'
 import { Component } from './component'
 import { Inventory } from './inventory'
+import { ImpossibleException } from '../messagelog'
+import { AreaRangedAttackHandler } from '../input-handler'
 
 export abstract class Effect implements Component {
 	protected constructor(
@@ -11,7 +13,7 @@ export abstract class Effect implements Component {
 		public uses: number = 1
 	) {}
 	update() {}
-	abstract activate(entity: Entity): void
+	abstract activate(action: ItemAction, entity: Entity): void
 
 	getAction(): Action | null {
 		if (this.entity) {
@@ -45,7 +47,7 @@ export class Healing extends Effect {
 		super(entity, uses)
 	}
 
-	activate(entity: Entity) {
+	activate(action: ItemAction, entity: Entity) {
 		const consumer = entity as Entity
 		const body = consumer.cmp.body
 		if (!consumer || !body) return
@@ -58,12 +60,62 @@ export class Healing extends Effect {
 			)
 			this.consume()
 		} else {
-			window.engine.messageLog.addMessage(
-				'Your health is already full.',
-				Colors.Gray
-			)
-			throw new Error('Your health is already full.')
+			throw new ImpossibleException('Your health is already full.')
 		}
+	}
+}
+
+export class Fireball extends Effect {
+	constructor(
+		public damage: number,
+		public radius: number,
+		parent: Entity | null = null
+	) {
+		super(parent)
+	}
+
+	activate(action: ItemAction, _entity: Entity) {
+		const { targetPosition } = action
+
+		if (!targetPosition) {
+			throw new ImpossibleException('You must select an area to target.')
+		}
+		const targetPos = targetPosition
+		if (!window.engine.gameMap.tiles[targetPos.y][targetPos.x].visible) {
+			throw new ImpossibleException(
+				'You cannot target an area that you cannot see.'
+			)
+		}
+
+		let targetsHit = false
+		for (let actor of window.engine.gameMap.actors) {
+			if (getDistance(actor.pos, targetPos) <= this.radius) {
+				window.engine.messageLog.addMessage(
+					`The ${actor.name} is engulfed in a fiery explosion, taking ${this.damage} damage!`
+				)
+				actor.cmp.body?.takeDamage(this.damage)
+				targetsHit = true
+			}
+
+			if (!targetsHit) {
+				throw new ImpossibleException('There are no targets in the radius.')
+			}
+			this.consume()
+		}
+	}
+
+	getAction(): Action | null {
+		window.engine.messageLog.addMessage(
+			'Select a target location.',
+			Colors.Yellow
+		)
+		window.engine.inputHandler = new AreaRangedAttackHandler(
+			this.radius,
+			(pos) => {
+				return new ItemAction(this.entity, pos)
+			}
+		)
+		return null
 	}
 }
 
@@ -77,7 +129,7 @@ export class Lightning extends Effect {
 		super(entity, uses)
 	}
 
-	activate(entity: Entity) {
+	activate(action: ItemAction, entity: Entity) {
 		let target: Entity | null = null
 		let closestDistance = this.maxRange + 1.0
 
@@ -101,8 +153,7 @@ export class Lightning extends Effect {
 			target.cmp.body?.takeDamage(this.damage)
 			this.consume()
 		} else {
-			window.engine.messageLog.addMessage('No enemy is close enough to strike.')
-			throw new Error('No enemy is close enough to strike.')
+			throw new ImpossibleException('No enemy is close enough to strike.')
 		}
 	}
 }

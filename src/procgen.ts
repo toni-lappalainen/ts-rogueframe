@@ -6,6 +6,7 @@ import { generateRandomNumber, isEqual, generateRandomPoint } from './utils'
 import orcData from '../res/prefab/orc.json'
 import healshroom from '../res/prefab/items/healshroom.json'
 import lightningshroom from '../res/prefab/items/lightningshroom.json'
+import fireballshroom from '../res/prefab/items/fireballshroom.json'
 
 interface Bounds {
 	x1: number
@@ -124,11 +125,10 @@ const placeEntities = (
 		)
 
 		if (!dungeon.entities.some((e) => isEqual(e.pos, pos))) {
-			if (Math.random() < 0.5) {
-				spawnEntity(healshroom, dungeon, pos)
-			} else {
-				spawnEntity(lightningshroom, dungeon, pos)
-			}
+			const rnd = Math.random()
+			if (rnd < 0.2) spawnEntity(healshroom, dungeon, pos)
+			else if (rnd < 0.5) spawnEntity(lightningshroom, dungeon, pos)
+			else spawnEntity(fireballshroom, dungeon, pos)
 		}
 	}
 }

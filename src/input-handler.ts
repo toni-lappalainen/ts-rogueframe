@@ -154,7 +154,6 @@ export class InventoryInputHandler extends BaseInputHandler {
 
 			if (index >= 0 && index <= 26) {
 				const item = window.engine.player.cmp.inventory?.items[index]
-				console.log(item)
 				if (item) {
 					this.nextHandler = new GameInputHandler()
 					if (this.inputState === InputState.UseInventory) {
@@ -214,37 +213,71 @@ export abstract class SelectIndexHandler extends BaseInputHandler {
 			if (event.ctrlKey) modifier = 10
 			if (event.altKey) modifier = 20
 
+			// FIXME: make this cleaner
 			let x = this.mousePosition.x
 			let y = this.mousePosition.y
 			let dx = moveAmount.x
 			let dy = moveAmount.y
-			console.log(x, y, dx, dy)
 			x += dx * modifier
 			y += dy * modifier
-			console.log(x, y, dx, dy)
 			x = Math.max(0, Math.min(x * modifier, Engine.MAP_WIDTH - 1))
 			y = Math.max(0, Math.min(y * modifier, Engine.MAP_HEIGHT - 1))
-			console.log(x, y, dx, dy)
 			this.mousePosition = { x: x, y: y }
 			return null
 		} else if (event.key === 'Enter') {
-			return this.onIndexSelected()
+			return this.onIndexSelected(this.mousePosition)
 		}
 
 		this.nextHandler = new GameInputHandler()
 		return null
 	}
 
-	abstract onIndexSelected(): Action | null
+	abstract onIndexSelected(targetPos: Point): Action | null
 }
+type ActionCallback = (pos: Point) => Action | null
 
 export class LookHandler extends SelectIndexHandler {
 	constructor() {
 		super()
 	}
 
-	onIndexSelected(): Action | null {
+	onIndexSelected(_targetPos: Point): Action | null {
 		this.nextHandler = new GameInputHandler()
 		return null
+	}
+}
+
+export class SingleRangedAttackHandler extends SelectIndexHandler {
+	constructor(public callback: ActionCallback) {
+		super()
+	}
+
+	onIndexSelected(targetPos: Point): Action | null {
+		this.nextHandler = new GameInputHandler()
+		return this.callback(targetPos)
+	}
+}
+
+export class AreaRangedAttackHandler extends SelectIndexHandler {
+	constructor(public radius: number, public callback: ActionCallback) {
+		super()
+	}
+
+	onRender(display: Display) {
+		const startX = this.mousePosition.x - this.radius - 1
+		const startY = this.mousePosition.y - this.radius - 1
+
+		for (let x = startX; x < startX + this.radius ** 2; x++) {
+			for (let y = startY; y < startY + this.radius ** 2; y++) {
+				const data = display._data[`${x},${y}`]
+				const char = data ? data[2] || ' ' : ' '
+				display.drawOver(x, y, char[0], '#fff', Colors.BrownYellow)
+			}
+		}
+	}
+
+	onIndexSelected(targetPos: Point): Action | null {
+		this.nextHandler = new GameInputHandler()
+		return this.callback(targetPos)
 	}
 }

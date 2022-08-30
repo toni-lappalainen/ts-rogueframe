@@ -1,6 +1,6 @@
 import { Entity } from '../entity'
 import { addXY, isEqual } from '../utils'
-import { Colors } from '../values'
+import { ImpossibleException } from '../messagelog'
 
 export abstract class Action {
 	abstract perform(entity: Entity): void
@@ -21,18 +21,13 @@ export class WaitAction extends Action {
 export class MovementAction extends ActionWithDirection {
 	perform(entity: Entity) {
 		if (!window.engine.gameMap.isInBounds(this.dir)) {
-			window.engine.messageLog.addMessage('That way is blocked.', Colors.Gray)
-			return
-			//throw new Error('That way is blocked.')
+			throw new ImpossibleException('That way is blocked.')
 		}
 		if (!window.engine.gameMap.tiles[this.dir.y][this.dir.x].walkable) {
-			window.engine.messageLog.addMessage('That way is blocked.', Colors.Gray)
-			return //throw new Error('That way is blocked.')
+			throw new ImpossibleException('That way is blocked.')
 		}
 		if (window.engine.gameMap.getBlockingEntityAtLocation(this.dir)) {
-			window.engine.messageLog.addMessage('That way is blocked.', Colors.Gray)
-			return
-			//throw new Error('That way is blocked.')
+			throw new ImpossibleException('That way is blocked.')
 		}
 
 		entity.move(this.dir)
@@ -43,8 +38,7 @@ export class MeleeAction extends ActionWithDirection {
 		const target = window.engine.gameMap.getBlockingEntityAtLocation(this.dir)
 
 		if (!target) {
-			window.engine.messageLog.addMessage('Nothing to attack', Colors.Gray)
-			throw new Error('Nothing to attack.')
+			throw new ImpossibleException('Nothing to attack.')
 		}
 		window.engine.messageLog.addMessage(
 			`${entity.name} kicks the ${target.name}, much to its annoyance!`
@@ -65,21 +59,31 @@ export class BumpAction extends ActionWithDirection {
 }
 
 export class ItemAction extends Action {
-	constructor(public item: Entity) {
+	constructor(
+		public item: Entity | null,
+		public targetPosition: Point | null = null
+	) {
 		super()
 	}
 
 	perform(entity: Entity) {
-		const effect = this.item.getEffect()
-		if (effect) effect.activate(entity)
-		else console.log('no effect')
+		const effect = this.item?.getEffect()
+		if (this.item && effect) effect.activate(this, entity)
+		else throw new ImpossibleException(`Cannot use ${this.item?.name}`)
+	}
+
+	public get targetActor(): Entity | undefined {
+		if (!this.targetPosition) {
+			return
+		}
+		return window.engine.gameMap.getEntityAtLocation(this.targetPosition)
 	}
 }
 
 export class DropItem extends ItemAction {
 	perform(entity: Entity) {
 		const dropper = entity
-		if (!dropper) return
+		if (!dropper || !this.item) return
 		dropper.cmp.inventory?.drop(this.item)
 	}
 }
@@ -96,28 +100,17 @@ export class PickupAction extends Action {
 		for (const item of window.engine.gameMap.items) {
 			if (isEqual(pos, item.pos)) {
 				if (inventory.items.length >= inventory.capacity) {
-					window.engine.messageLog.addMessage(
-						`${consumer.name}'s inventory is full.`,
-						Colors.Gray
-					)
-					throw new Error('Your inventory is full.')
+					throw new ImpossibleException('Your inventory is full.')
 				}
 
 				window.engine.gameMap.removeEntity(item)
 				item.parent = inventory
 				inventory.items.push(item)
 
-				window.engine.messageLog.addMessage(
-					`${consumer.name} picked up the ${item.name}!`
-				)
+				window.engine.messageLog.addMessage(`You picked up the ${item.name}!`)
 				return
 			}
 		}
-
-		window.engine.messageLog.addMessage(
-			'There is nothing here to pick up.',
-			Colors.Gray
-		)
-		throw new Error('There is nothing here to pick up.')
+		throw new ImpossibleException('There is nothing here to pick up.')
 	}
 }
