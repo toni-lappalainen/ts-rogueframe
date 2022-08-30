@@ -1,6 +1,4 @@
-import { spawnEntity } from './entity'
 import { Engine } from './engine'
-import playerData from '../res/prefab/player.json'
 import { MessageLog } from './messagelog'
 
 declare global {
@@ -12,6 +10,6 @@ declare global {
 
 window.addEventListener('DOMContentLoaded', () => {
 	window.msgLog = new MessageLog()
-	window.engine = new Engine(spawnEntity(playerData))
-	window.engine.render()
+	window.engine = new Engine()
+	window.engine.screen.render()
 })

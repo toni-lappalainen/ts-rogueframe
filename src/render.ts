@@ -29,10 +29,13 @@ export const renderHearts = (
 
 export const renderNamesAtLocation = (pos: Point, entities: Entity[]) => {
 	let width = 21
+
 	const names = entities
 		.map((e) => e.name.charAt(0).toUpperCase() + e.name.substring(1))
 		.join(', ')
+
 	if (names.length > width - 4) width = names.length + 4
+
 	renderFrameWithTitle(pos.x + 1, pos.y - 3, width, 12, names)
 	window.engine.display.drawText(
 		pos.x + 3,

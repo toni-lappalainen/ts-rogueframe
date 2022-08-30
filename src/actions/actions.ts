@@ -1,9 +1,10 @@
 import { Entity } from '../entity'
 import { addXY, isEqual } from '../utils'
 import { ImpossibleException } from '../messagelog'
+import { GameMap } from '../map'
 
 export abstract class Action {
-	abstract perform(entity: Entity): void
+	abstract perform(entity: Entity, gameMap: GameMap): void
 }
 
 export abstract class ActionWithDirection extends Action {
@@ -11,7 +12,7 @@ export abstract class ActionWithDirection extends Action {
 		super()
 	}
 
-	perform(_entity: Entity) {}
+	perform(entity: Entity, gameMap: GameMap) {}
 }
 
 export class WaitAction extends Action {
@@ -19,14 +20,14 @@ export class WaitAction extends Action {
 }
 
 export class MovementAction extends ActionWithDirection {
-	perform(entity: Entity) {
-		if (!window.engine.gameMap.isInBounds(this.dir)) {
+	perform(entity: Entity, gameMap: GameMap) {
+		if (!gameMap.isInBounds(this.dir)) {
 			throw new ImpossibleException('That way is blocked.')
 		}
-		if (!window.engine.gameMap.tiles[this.dir.y][this.dir.x].walkable) {
+		if (!gameMap.tiles[this.dir.y][this.dir.x].walkable) {
 			throw new ImpossibleException('That way is blocked.')
 		}
-		if (window.engine.gameMap.getBlockingEntityAtLocation(this.dir)) {
+		if (gameMap.getBlockingEntityAtLocation(this.dir)) {
 			throw new ImpossibleException('That way is blocked.')
 		}
 
@@ -34,8 +35,8 @@ export class MovementAction extends ActionWithDirection {
 	}
 }
 export class MeleeAction extends ActionWithDirection {
-	perform(entity: Entity) {
-		const target = window.engine.gameMap.getBlockingEntityAtLocation(this.dir)
+	perform(entity: Entity, gameMap: GameMap) {
+		const target = gameMap.getBlockingEntityAtLocation(this.dir)
 
 		if (!target) {
 			throw new ImpossibleException('Nothing to attack.')
@@ -47,13 +48,13 @@ export class MeleeAction extends ActionWithDirection {
 }
 
 export class BumpAction extends ActionWithDirection {
-	perform(entity: Entity) {
+	perform(entity: Entity, gameMap: GameMap) {
 		const direction = addXY(entity.pos, this.dir)
 
-		if (window.engine.gameMap.getBlockingEntityAtLocation(direction)) {
-			return new MeleeAction(direction).perform(entity)
+		if (gameMap.getBlockingEntityAtLocation(direction)) {
+			return new MeleeAction(direction).perform(entity, gameMap)
 		} else {
-			return new MovementAction(direction).perform(entity)
+			return new MovementAction(direction).perform(entity, gameMap)
 		}
 	}
 }
@@ -66,30 +67,30 @@ export class ItemAction extends Action {
 		super()
 	}
 
-	perform(entity: Entity) {
+	perform(entity: Entity, gameMap: GameMap) {
 		const effect = this.item?.getEffect()
-		if (this.item && effect) effect.activate(this, entity)
+		if (this.item && effect) effect.activate(this, entity, gameMap)
 		else throw new ImpossibleException(`Cannot use ${this.item?.name}`)
 	}
 
-	public get targetActor(): Entity | undefined {
+	targetActor(gameMap: GameMap): Entity | undefined {
 		if (!this.targetPosition) {
 			return
 		}
-		return window.engine.gameMap.getEntityAtLocation(this.targetPosition)
+		return gameMap.getEntityAtLocation(this.targetPosition)
 	}
 }
 
 export class DropItem extends ItemAction {
-	perform(entity: Entity) {
+	perform(entity: Entity, gameMap: GameMap) {
 		const dropper = entity
 		if (!dropper || !this.item) return
-		dropper.cmp.inventory?.drop(this.item)
+		dropper.cmp.inventory?.drop(this.item, gameMap)
 	}
 }
 
 export class PickupAction extends Action {
-	perform(entity: Entity) {
+	perform(entity: Entity, gameMap: GameMap) {
 		const consumer = entity
 		if (!consumer) return
 
@@ -97,13 +98,13 @@ export class PickupAction extends Action {
 		const inventory = consumer.cmp.inventory
 		if (!inventory) return
 
-		for (const item of window.engine.gameMap.items) {
+		for (const item of gameMap.items) {
 			if (isEqual(pos, item.pos)) {
 				if (inventory.items.length >= inventory.capacity) {
 					throw new ImpossibleException('Your inventory is full.')
 				}
 
-				window.engine.gameMap.removeEntity(item)
+				gameMap.removeEntity(item)
 				item.parent = inventory
 				inventory.items.push(item)
 

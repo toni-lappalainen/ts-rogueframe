@@ -1,6 +1,6 @@
 import { Entity } from './entity'
 import { Engine } from './engine'
-import { addXY, isEqual } from './utils'
+import { isEqual } from './utils'
 import { renderNamesAtLocation } from './render'
 import { Colors } from './values'
 import {
@@ -11,6 +11,7 @@ import {
 	WaitAction,
 } from './actions/actions'
 import { Display } from 'rot-js'
+import { GameMap } from './map'
 
 interface MovementMap {
 	[key: string]: Action
@@ -179,16 +180,15 @@ export class LogAction extends Action {
 	}
 }
 
-export const handleMouse = (event: MouseEvent, pos: Point = { x: 0, y: 0 }) => {
+export const handleMouse = (
+	event: MouseEvent,
+	pos: Point = { x: 0, y: 0 },
+	gameMap: GameMap
+) => {
 	// Map inputs
-	if (
-		window.engine.gameMap.isInBounds(pos) &&
-		window.engine.gameMap.tiles[pos.y][pos.x].visible
-	) {
+	if (gameMap.isInBounds(pos) && gameMap.tiles[pos.y][pos.x].visible) {
 		if (event.button === 0) {
-			const entities = window.engine.gameMap.entities.filter((e) =>
-				isEqual(e.pos, pos)
-			)
+			const entities = gameMap.entities.filter((e) => isEqual(e.pos, pos))
 			if (entities.length) renderNamesAtLocation(pos, entities)
 		}
 	}

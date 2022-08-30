@@ -6,6 +6,7 @@ import { Component } from './component'
 import { Inventory } from './inventory'
 import { ImpossibleException } from '../messagelog'
 import { AreaRangedAttackHandler } from '../input-handler'
+import { GameMap } from '../map'
 
 export abstract class Effect implements Component {
 	protected constructor(
@@ -13,7 +14,7 @@ export abstract class Effect implements Component {
 		public uses: number = 1
 	) {}
 	update() {}
-	abstract activate(action: ItemAction, entity: Entity): void
+	abstract activate(action: ItemAction, entity: Entity, gameMap: GameMap): void
 
 	getAction(): Action | null {
 		if (this.entity) {
@@ -74,21 +75,21 @@ export class Fireball extends Effect {
 		super(parent)
 	}
 
-	activate(action: ItemAction, _entity: Entity) {
+	activate(action: ItemAction, _entity: Entity, gameMap: GameMap) {
 		const { targetPosition } = action
 
 		if (!targetPosition) {
 			throw new ImpossibleException('You must select an area to target.')
 		}
 		const targetPos = targetPosition
-		if (!window.engine.gameMap.tiles[targetPos.y][targetPos.x].visible) {
+		if (!gameMap.tiles[targetPos.y][targetPos.x].visible) {
 			throw new ImpossibleException(
 				'You cannot target an area that you cannot see.'
 			)
 		}
 
 		let targetsHit = false
-		for (let actor of window.engine.gameMap.actors) {
+		for (let actor of gameMap.actors) {
 			if (getDistance(actor.pos, targetPos) <= this.radius) {
 				window.msgLog.addMessage(
 					`The ${actor.name} is engulfed in a fiery explosion, taking ${this.damage} damage!`
@@ -96,12 +97,11 @@ export class Fireball extends Effect {
 				actor.cmp.body?.takeDamage(this.damage)
 				targetsHit = true
 			}
-
-			if (!targetsHit) {
-				throw new ImpossibleException('There are no targets in the radius.')
-			}
-			this.consume()
 		}
+		if (!targetsHit) {
+			throw new ImpossibleException('There are no targets in the radius.')
+		}
+		this.consume()
 	}
 
 	getAction(): Action | null {
@@ -126,14 +126,14 @@ export class Lightning extends Effect {
 		super(entity, uses)
 	}
 
-	activate(action: ItemAction, entity: Entity) {
+	activate(action: ItemAction, entity: Entity, gameMap: GameMap) {
 		let target: Entity | null = null
 		let closestDistance = this.maxRange + 1.0
 
-		for (const actor of window.engine.gameMap.actors) {
+		for (const actor of gameMap.actors) {
 			if (
 				!Object.is(actor, entity) &&
-				window.engine.gameMap.tiles[actor.pos.y][actor.pos.x].visible
+				gameMap.tiles[actor.pos.y][actor.pos.x].visible
 			) {
 				const distance = getDistance(entity.pos, actor.pos)
 				if (distance < closestDistance) {
