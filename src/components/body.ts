@@ -57,6 +57,6 @@ export class BodyCmp implements Component {
 		//this.entity.ai = null
 		this.entity.name = `Remains of ${this.entity.name}`
 		this.entity.renderOrder = RenderOrder.Corpse
-		window.engine.messageLog.addMessage(deathMessage)
+		window.msgLog.addMessage(deathMessage)
 	}
 }

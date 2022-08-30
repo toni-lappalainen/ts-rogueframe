@@ -19,7 +19,7 @@ export class Inventory implements Component {
 			if (this.entity) {
 				item.place(this.entity.pos, window.engine.gameMap)
 			}
-			window.engine.messageLog.addMessage(
+			window.msgLog.addMessage(
 				`${this.entity?.name} dropped the ${item.name}."`
 			)
 		}

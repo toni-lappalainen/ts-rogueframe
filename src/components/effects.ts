@@ -54,7 +54,7 @@ export class Healing extends Effect {
 		const amountRecovered = body.heal(this.amount)
 
 		if (amountRecovered > 0) {
-			window.engine.messageLog.addMessage(
+			window.msgLog.addMessage(
 				`${entity.name} consumes the ${this.entity?.name}, and recovers ${amountRecovered} HP!`,
 				Colors.Green
 			)
@@ -90,7 +90,7 @@ export class Fireball extends Effect {
 		let targetsHit = false
 		for (let actor of window.engine.gameMap.actors) {
 			if (getDistance(actor.pos, targetPos) <= this.radius) {
-				window.engine.messageLog.addMessage(
+				window.msgLog.addMessage(
 					`The ${actor.name} is engulfed in a fiery explosion, taking ${this.damage} damage!`
 				)
 				actor.cmp.body?.takeDamage(this.damage)
@@ -105,10 +105,7 @@ export class Fireball extends Effect {
 	}
 
 	getAction(): Action | null {
-		window.engine.messageLog.addMessage(
-			'Select a target location.',
-			Colors.Yellow
-		)
+		window.msgLog.addMessage('Select a target location.', Colors.Yellow)
 		window.engine.inputHandler = new AreaRangedAttackHandler(
 			this.radius,
 			(pos) => {
@@ -147,7 +144,7 @@ export class Lightning extends Effect {
 		}
 
 		if (target) {
-			window.engine.messageLog.addMessage(
+			window.msgLog.addMessage(
 				`A lightning bolt strikes the ${target.name} with a loud thunder, for ${this.damage} damage!`
 			)
 			target.cmp.body?.takeDamage(this.damage)

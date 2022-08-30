@@ -48,11 +48,11 @@ export enum InputState {
 export abstract class BaseInputHandler {
 	nextHandler: BaseInputHandler
 	mousePosition: Point
-	//logCursorPosition: number
+	logCursorPosition: number
 	protected constructor(public inputState: InputState = InputState.Game) {
 		this.nextHandler = this
 		this.mousePosition = { x: 0, y: 0 }
-		//this.logCursorPosition = window.engine.messageLog.messages.length - 1
+		this.logCursorPosition = window.msgLog.messages.length - 1
 	}
 
 	abstract handleKeyboardInput(event: KeyboardEvent): Action | null
@@ -104,13 +104,11 @@ export class LogInputHandler extends BaseInputHandler {
 
 	handleKeyboardInput(event: KeyboardEvent): Action | null {
 		if (event.key === 'Home') {
-			return new LogAction(() => (window.engine.logCursorPosition = 0))
+			return new LogAction(() => (this.logCursorPosition = 0))
 		}
 		if (event.key === 'End') {
 			return new LogAction(
-				() =>
-					(window.engine.logCursorPosition =
-						window.engine.messageLog.messages.length - 1)
+				() => (this.logCursorPosition = window.msgLog.messages.length - 1)
 			)
 		}
 
@@ -121,21 +119,19 @@ export class LogInputHandler extends BaseInputHandler {
 		}
 
 		return new LogAction(() => {
-			if (scrollAmount < 0 && window.engine.logCursorPosition === 0) {
-				window.engine.logCursorPosition =
-					window.engine.messageLog.messages.length - 1
+			if (scrollAmount < 0 && this.logCursorPosition === 0) {
+				this.logCursorPosition = window.msgLog.messages.length - 1
 			} else if (
 				scrollAmount > 0 &&
-				window.engine.logCursorPosition ===
-					window.engine.messageLog.messages.length - 1
+				this.logCursorPosition === window.msgLog.messages.length - 1
 			) {
-				window.engine.logCursorPosition = 0
+				this.logCursorPosition = 0
 			} else {
-				window.engine.logCursorPosition = Math.max(
+				this.logCursorPosition = Math.max(
 					0,
 					Math.min(
-						window.engine.logCursorPosition + scrollAmount,
-						window.engine.messageLog.messages.length - 1
+						this.logCursorPosition + scrollAmount,
+						window.msgLog.messages.length - 1
 					)
 				)
 			}
@@ -163,7 +159,7 @@ export class InventoryInputHandler extends BaseInputHandler {
 						return new DropItem(item)
 					}
 				} else {
-					window.engine.messageLog.addMessage('Invalid entry.', Colors.Gray)
+					window.msgLog.addMessage('Invalid entry.', Colors.Gray)
 					return null
 				}
 			}
@@ -200,9 +196,7 @@ export const handleMouse = (event: MouseEvent, pos: Point = { x: 0, y: 0 }) => {
 export abstract class SelectIndexHandler extends BaseInputHandler {
 	protected constructor() {
 		super(InputState.Target)
-		const x = window.engine.player.pos.x
-		const y = window.engine.player.pos.y
-		this.mousePosition = { x: x, y: y }
+		this.mousePosition = window.engine.player.pos
 	}
 
 	handleKeyboardInput(event: KeyboardEvent): Action | null {
@@ -269,9 +263,7 @@ export class AreaRangedAttackHandler extends SelectIndexHandler {
 
 		for (let x = startX; x < startX + this.radius ** 2; x++) {
 			for (let y = startY; y < startY + this.radius ** 2; y++) {
-				const data = display._data[`${x},${y}`]
-				const char = data ? data[2] || ' ' : ' '
-				display.drawOver(x, y, char[0], '#fff', Colors.BrownYellow)
+				display.drawOver(x, y, null, '#fff', Colors.BrownYellow)
 			}
 		}
 	}

@@ -40,7 +40,7 @@ export class MeleeAction extends ActionWithDirection {
 		if (!target) {
 			throw new ImpossibleException('Nothing to attack.')
 		}
-		window.engine.messageLog.addMessage(
+		window.msgLog.addMessage(
 			`${entity.name} kicks the ${target.name}, much to its annoyance!`
 		)
 	}
@@ -107,7 +107,7 @@ export class PickupAction extends Action {
 				item.parent = inventory
 				inventory.items.push(item)
 
-				window.engine.messageLog.addMessage(`You picked up the ${item.name}!`)
+				window.msgLog.addMessage(`You picked up the ${item.name}!`)
 				return
 			}
 		}
