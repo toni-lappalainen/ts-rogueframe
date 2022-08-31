@@ -2,7 +2,7 @@ import { Component } from './component'
 import { Entity, RenderOrder } from '../entity'
 
 export class BodyCmp implements Component {
-	entity: Entity | null
+	entity?: Entity
 	_hp: number
 
 	constructor(
@@ -12,7 +12,7 @@ export class BodyCmp implements Component {
 		public isAlive: boolean = true
 	) {
 		this._hp = maxHp
-		this.entity = null
+		//this.entity = null
 	}
 	update() {}
 

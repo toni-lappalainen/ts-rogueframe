@@ -1,7 +1,7 @@
 import { Entity } from '../entity'
 
 export interface Component {
-	entity: Entity | null
+	entity?: Entity
 	update: () => void
 }
 

@@ -98,6 +98,10 @@ export class DropItem extends ItemAction {
 		const dropper = entity
 		if (!dropper || !this.item) return
 		dropper.cmp.inventory?.drop(this.item, gameMap)
+
+		if (dropper.cmp.equipment?.itemIsEquipped(this.item)) {
+			dropper.cmp.equipment.toggleEquip(this.item)
+		}
 	}
 }
 
@@ -126,5 +130,16 @@ export class PickupAction extends Action {
 			}
 		}
 		throw new ImpossibleException('There is nothing here to pick up.')
+	}
+}
+
+export class EquipAction extends Action {
+	constructor(public item: Entity) {
+		super()
+	}
+
+	perform(entity: Entity, _gameMap: GameMap) {
+		if (!entity) return
+		entity.cmp.equipment?.toggleEquip(this.item)
 	}
 }

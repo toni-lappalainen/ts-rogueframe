@@ -1,12 +1,13 @@
 import { Entity } from './entity'
 import { Engine } from './engine'
 import { isEqual } from './utils'
-import { renderNamesAtLocation } from './render'
+import { renderFrameWithTitle, renderNamesAtLocation } from './render'
 import { Colors } from './values'
 import {
 	Action,
 	BumpAction,
 	DropItem,
+	EquipAction,
 	PickupAction,
 	TakeStairsAction,
 	WaitAction,
@@ -93,11 +94,43 @@ export class GameInputHandler extends BaseInputHandler {
 			if (event.key === 'l') {
 				this.nextHandler = new LookHandler()
 			}
+			if (event.key === 'c') {
+				this.nextHandler = new CharacterScreenInputHandler()
+			}
 			if (event.key === '>') {
 				return new TakeStairsAction()
 			}
 		}
 
+		return null
+	}
+}
+export class CharacterScreenInputHandler extends BaseInputHandler {
+	constructor() {
+		super()
+	}
+
+	onRender(display: Display) {
+		const x = window.engine.player.pos.x <= 30 ? 40 : 1
+		const y = 1
+		const title = 'Character Information'
+		const width = title.length + 10
+		const height = 20
+
+		renderFrameWithTitle(x, y, width, height, title)
+
+		display.drawText(
+			x + 2,
+			y + 2,
+			`%c{${Colors.BrownLight}}Level: ${window.engine.player.cmp.exp?.currentLevel}
+XP: ${window.engine.player.cmp.exp?.currentXp}
+XP for next Level: ${window.engine.player.cmp.exp?.experienceToNextLevel}
+Attack: ${window.engine.player.cmp.body?.power}
+Defense: ${window.engine.player.cmp.body?.defense}`
+		)
+	}
+	handleKeyboardInput(_event: KeyboardEvent): Action | null {
+		this.nextHandler = new GameInputHandler()
 		return null
 	}
 }
@@ -158,8 +191,13 @@ export class InventoryInputHandler extends BaseInputHandler {
 				if (item) {
 					this.nextHandler = new GameInputHandler()
 					if (this.inputState === InputState.UseInventory) {
-						const action = item.getEffect()?.getAction()
-						if (action) return action
+						if (item.cmp.item?.consumable) {
+							const action = item.getEffect()?.getAction()
+							if (action) return action
+						} else if (item.cmp.equippable) {
+							return new EquipAction(item)
+						}
+						return null
 					} else if (this.inputState === InputState.DropInventory) {
 						return new DropItem(item)
 					}
@@ -262,15 +300,29 @@ export class AreaRangedAttackHandler extends SelectIndexHandler {
 	}
 
 	onRender(display: Display) {
-		const startX = this.mousePosition.x - this.radius - 1
-		const startY = this.mousePosition.y - this.radius - 1
+		const startX = this.mousePosition.x - this.radius
+		const startY = this.mousePosition.y - this.radius
 
-		for (let x = startX; x < startX + this.radius ** 2; x++) {
-			for (let y = startY; y < startY + this.radius ** 2; y++) {
+		for (let x = startX; x < this.mousePosition.x + this.radius + 1; x++) {
+			for (let y = startY; y < this.mousePosition.y + this.radius + 1; y++) {
 				display.drawOver(x, y, null, '#fff', Colors.BrownYellow)
 			}
 		}
+		display.drawOver(this.mousePosition.x, this.mousePosition.y, 'X', '#fff')
 	}
+
+	/*
+	public void DrawRectangle(Pen pen, int xCenter, int yCenter, int width, int height)
+{
+    //Find the x-coordinate of the upper-left corner of the rectangle to draw.
+    int x = xCenter - width / 2;
+
+    //Find y-coordinate of the upper-left corner of the rectangle to draw. 
+    int y = yCenter - height / 2;
+
+    Graphics.DrawRectangle(pen, x, y, width, height);
+}
+	*/
 
 	onIndexSelected(targetPos: Point): Action | null {
 		this.nextHandler = new GameInputHandler()

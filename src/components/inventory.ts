@@ -3,11 +3,10 @@ import { Entity } from '../entity'
 import { GameMap } from '../map'
 
 export class Inventory implements Component {
-	entity: Entity | null
+	entity?: Entity
 	items: Entity[]
 
 	constructor(public capacity: number) {
-		this.entity = null
 		this.items = []
 	}
 

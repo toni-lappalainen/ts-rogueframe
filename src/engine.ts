@@ -33,7 +33,8 @@ export class Engine {
 		this.player = spawnEntity(playerData)
 
 		const container = this.display.getContainer()!
-		document.body.appendChild(container)
+		//document.body.appendChild(container)
+		document.getElementById('game')?.appendChild(container)
 
 		window.addEventListener('keydown', (event) => {
 			this.update(event)

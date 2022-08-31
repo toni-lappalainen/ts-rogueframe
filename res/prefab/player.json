@@ -15,6 +15,7 @@
 		},
 		"Inventory": {
 			"capacity": 24
-		}
+		},
+		"Exp": {}
 	}
 }

@@ -60,7 +60,7 @@ export const renderFrameWithTitle = (
 	const horizontal = '─'
 	const leftTitle = '┤'
 	const rightTitle = '├'
-	const empty = `%b{${Colors.Primary}} `
+	const empty = `%b{${Colors.Black}} `
 
 	const innerWidth = width - 2
 	const innerHeight = height - 2
@@ -77,19 +77,19 @@ export const renderFrameWithTitle = (
 		horizontal.repeat(remainingAfterTitle - left) +
 		topRight
 	const middleRow =
-		`%b{${Colors.Secondary}}${vertical}` +
+		`%b{${Colors.BrownLight}}${vertical}` +
 		empty.repeat(innerWidth) +
-		`%b{${Colors.Secondary}}${vertical}`
+		`%b{${Colors.BrownLight}}${vertical}`
 	const bottomRow = bottomLeft + horizontal.repeat(innerWidth) + bottomRight
 
-	window.engine.display.drawText(x, y, `%b{${Colors.Secondary}}${topRow}`)
+	window.engine.display.drawText(x, y, `%b{${Colors.BrownLight}}${topRow}`)
 	for (let i = 1; i <= innerHeight; i++) {
 		window.engine.display.drawText(x, y + i, middleRow)
 	}
 	window.engine.display.drawText(
 		x,
 		y + height - 1,
-		`%b{${Colors.Secondary}}${bottomRow}`
+		`%b{${Colors.BrownLight}}${bottomRow}`
 	)
 }
 
@@ -108,7 +108,10 @@ export const renderInventory = (title: string) => {
 	if (itemCount > 0) {
 		inventory.items.forEach((i, index) => {
 			const key = String.fromCharCode('a'.charCodeAt(0) + index)
-			window.engine.display.drawText(x + 1, y + index + 1, `(${key}) ${i.name}`)
+			const isEquipped = player.cmp.equipment?.itemIsEquipped(i)
+			let itemString = `(${key}) ${i.name}`
+			itemString = isEquipped ? `${itemString} (E)` : itemString
+			window.engine.display.drawText(x + 1, y + index + 1, itemString)
 		})
 	} else {
 		window.engine.display.drawText(x + 1, y + 1, '(Empty)')

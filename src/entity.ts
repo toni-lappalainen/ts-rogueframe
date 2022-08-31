@@ -145,7 +145,6 @@ export const spawnEntity = (
 	}
 
 	entity.add(entityCmps)
-	console.log(entity.id)
 	return entity
 }
 

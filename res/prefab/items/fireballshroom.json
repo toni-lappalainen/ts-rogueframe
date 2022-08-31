@@ -14,7 +14,7 @@
 		},
 		"Fireball": {
 			"damage": 6,
-			"radius": 2
+			"radius": 3
 		}
 	}
 }

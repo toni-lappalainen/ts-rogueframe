@@ -9,10 +9,7 @@ import { AreaRangedAttackHandler } from '../input-handler'
 import { GameMap } from '../map'
 
 export abstract class Effect implements Component {
-	protected constructor(
-		public entity: Entity | null,
-		public uses: number = 1
-	) {}
+	protected constructor(public entity: Entity, public uses: number = 1) {}
 	update() {}
 	abstract activate(action: ItemAction, entity: Entity, gameMap: GameMap): void
 
@@ -42,7 +39,7 @@ export abstract class Effect implements Component {
 export class Healing extends Effect {
 	constructor(
 		public amount: number = 1,
-		public entity: Entity | null = null,
+		public entity: Entity,
 		public uses: number = 1
 	) {
 		super(entity, uses)
@@ -66,12 +63,9 @@ export class Healing extends Effect {
 	}
 }
 
+// TODO: radius is WithRequiredSignature
 export class Fireball extends Effect {
-	constructor(
-		public damage: number,
-		public radius: number,
-		parent: Entity | null = null
-	) {
+	constructor(public damage: number, public radius: number, parent: Entity) {
 		super(parent)
 	}
 
@@ -120,7 +114,7 @@ export class Lightning extends Effect {
 	constructor(
 		public damage: number = 1,
 		public maxRange: number = 10,
-		public entity: Entity | null = null,
+		public entity: Entity,
 		public uses: number = 1
 	) {
 		super(entity, uses)
