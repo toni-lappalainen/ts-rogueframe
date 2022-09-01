@@ -4,7 +4,6 @@ import {
 	MovementAction,
 	WaitAction,
 } from '../actions/actions'
-//import * as ROT from 'rot-js'
 import { RNG } from 'rot-js'
 import { Entity } from '../entity'
 import { Component } from './component'
