@@ -1,7 +1,7 @@
 import { Entity } from '../entity'
 import { Action, ItemAction } from '../actions/actions'
 import { Colors } from '../values'
-import { getDistance } from '../utils'
+import { getDistance, getCircle } from '../utils'
 import { Component } from './component'
 import { Inventory } from './inventory'
 import { ImpossibleException } from '../messagelog'
@@ -75,23 +75,40 @@ export class Fireball extends Effect {
 		if (!targetPosition) {
 			throw new ImpossibleException('You must select an area to target.')
 		}
-		const targetPos = targetPosition
-		if (!gameMap.tiles[targetPos.y][targetPos.x].visible) {
+		const areaOfEffect = getCircle(targetPosition, this.radius)
+
+		if (!gameMap.tiles[targetPosition.y][targetPosition.x].visible) {
 			throw new ImpossibleException(
 				'You cannot target an area that you cannot see.'
 			)
 		}
 
 		let targetsHit = false
+
+		const entitiesInArea = gameMap.entitiesInsideCircle(
+			targetPosition,
+			this.radius
+		)
+		console.log(entitiesInArea.length)
+		if (entitiesInArea.length) {
+			entitiesInArea.forEach((e) => {
+				window.msgLog.addMessage(
+					`The ${e.name} is engulfed in a fiery explosion, taking ${this.damage} damage!`
+				)
+				e.cmp.body?.takeDamage(this.damage)
+			})
+			targetsHit = true
+		}
+		/*
 		for (let actor of gameMap.actors) {
-			if (getDistance(actor.pos, targetPos) <= this.radius) {
+			if (getDistance(actor.pos, targetPosition) <= this.radius) {
 				window.msgLog.addMessage(
 					`The ${actor.name} is engulfed in a fiery explosion, taking ${this.damage} damage!`
 				)
 				actor.cmp.body?.takeDamage(this.damage)
 				targetsHit = true
 			}
-		}
+		}*/
 		if (!targetsHit) {
 			throw new ImpossibleException('There are no targets in the radius.')
 		}

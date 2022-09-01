@@ -1,6 +1,6 @@
 import { Entity } from './entity'
 import { Engine } from './engine'
-import { isEqual } from './utils'
+import { getCircle, isEqual } from './utils'
 import { renderFrameWithTitle, renderNamesAtLocation } from './render'
 import { Colors } from './values'
 import {
@@ -300,29 +300,27 @@ export class AreaRangedAttackHandler extends SelectIndexHandler {
 	}
 
 	onRender(display: Display) {
+		getCircle(this.mousePosition, this.radius).forEach((coord) => {
+			display.drawOver(coord.x, coord.y, null, '#fff', Colors.BrownYellow)
+		})
+
 		const startX = this.mousePosition.x - this.radius
 		const startY = this.mousePosition.y - this.radius
-
+		/*
 		for (let x = startX; x < this.mousePosition.x + this.radius + 1; x++) {
 			for (let y = startY; y < this.mousePosition.y + this.radius + 1; y++) {
 				display.drawOver(x, y, null, '#fff', Colors.BrownYellow)
 			}
-		}
-		display.drawOver(this.mousePosition.x, this.mousePosition.y, 'X', '#fff')
+		}*/
+
+		display.drawOver(
+			this.mousePosition.x,
+			this.mousePosition.y,
+			'X',
+			'#fff',
+			null
+		)
 	}
-
-	/*
-	public void DrawRectangle(Pen pen, int xCenter, int yCenter, int width, int height)
-{
-    //Find the x-coordinate of the upper-left corner of the rectangle to draw.
-    int x = xCenter - width / 2;
-
-    //Find y-coordinate of the upper-left corner of the rectangle to draw. 
-    int y = yCenter - height / 2;
-
-    Graphics.DrawRectangle(pen, x, y, width, height);
-}
-	*/
 
 	onIndexSelected(targetPos: Point): Action | null {
 		this.nextHandler = new GameInputHandler()

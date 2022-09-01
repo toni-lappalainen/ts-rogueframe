@@ -24,3 +24,27 @@ export const isEqual = (p1: Point, p2: Point) => {
 export const getDistance = (pos1: Point, pos2: Point) => {
 	return Math.sqrt((pos2.x - pos1.x) ** 2 + (pos2.y - pos1.y) ** 2)
 }
+
+export const getCircle = (center: Point, radius: number): Point[] => {
+	const coordsInCircle: Point[] = []
+	const top = Math.ceil(center.y - radius)
+	const bottom = Math.floor(center.y + radius)
+	const left = Math.ceil(center.x - radius)
+	const right = Math.floor(center.x + radius)
+
+	const inside_circle = (center: Point, tile: Point, radius: number) => {
+		const dx = center.x - tile.x
+		const dy = center.y - tile.y
+		const distance_squared = dx * dx + dy * dy
+		return distance_squared <= radius * radius
+	}
+
+	for (let y = top; y <= bottom; y++) {
+		for (let x = left; x <= right; x++) {
+			if (inside_circle(center, { x: x, y: y }, radius)) {
+				coordsInCircle.push({ x: x, y: y })
+			}
+		}
+	}
+	return coordsInCircle
+}

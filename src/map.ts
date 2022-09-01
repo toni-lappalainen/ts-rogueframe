@@ -69,6 +69,22 @@ export class GameMap {
 		return 0 <= pos.x && pos.x < this.width && 0 <= pos.y && pos.y < this.height
 	}
 
+	isInCircle(pos: Point, center: Point, radius: number) {
+		const dist_points =
+			(pos.x - center.x) * (pos.x - center.x) +
+			(pos.y - center.y) * (pos.y - center.y)
+		radius *= radius
+		if (dist_points <= radius) {
+			return true
+		}
+		return false
+	}
+
+	entitiesInsideCircle(center: Point, radius: number) {
+		console.log(center)
+		return this.entities.filter((e) => this.isInCircle(e.pos, center, radius))
+	}
+
 	getBlockingEntityAtLocation(pos: Point): Entity | undefined {
 		return this.entities.find((e) => e.blocksMovement && isEqual(e.pos, pos)) //e.pos.x === x && e.pos.y === y)
 	}
