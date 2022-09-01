@@ -69,6 +69,16 @@ export class GameMap {
 		return 0 <= pos.x && pos.x < this.width && 0 <= pos.y && pos.y < this.height
 	}
 
+	isInRectangle(pos: Point, startPos: Point, width: number, height: number) {
+		const endPos = { x: startPos.x + width, y: startPos.y + height }
+		return (
+			startPos.x <= pos.x &&
+			pos.x < endPos.x &&
+			startPos.y <= pos.y &&
+			pos.y < endPos.y
+		)
+	}
+
 	isInCircle(pos: Point, center: Point, radius: number) {
 		const dist_points =
 			(pos.x - center.x) * (pos.x - center.x) +

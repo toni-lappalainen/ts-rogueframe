@@ -1,14 +1,8 @@
 import * as ROT from 'rot-js'
 import playerData from '../res/prefab/player.json'
-import {
-	BaseInputHandler,
-	GameInputHandler,
-	InputState,
-	handleMouse,
-} from './input-handler'
+import { BaseInputHandler, GameInputHandler } from './input-handler'
 import { Entity, spawnEntity } from './entity'
 import { BaseScreen } from './screens/screen'
-import { GameScreen } from './screens/gamescreen'
 import { MainMenu } from './screens/mainmenu'
 
 export class Engine {
@@ -33,7 +27,6 @@ export class Engine {
 		this.player = spawnEntity(playerData)
 
 		const container = this.display.getContainer()!
-		//document.body.appendChild(container)
 		document.getElementById('game')?.appendChild(container)
 
 		window.addEventListener('keydown', (event) => {

@@ -1,6 +1,6 @@
 import { Entity } from './entity'
 import { Engine } from './engine'
-import { getCircle, isEqual } from './utils'
+import { getCircle, isEqual, multiplyXY, addXY } from './utils'
 import { renderFrameWithTitle, renderNamesAtLocation } from './render'
 import { Colors } from './values'
 import {
@@ -119,15 +119,13 @@ export class CharacterScreenInputHandler extends BaseInputHandler {
 
 		renderFrameWithTitle(x, y, width, height, title)
 
-		display.drawText(
-			x + 2,
-			y + 2,
-			`%c{${Colors.BrownLight}}Level: ${window.engine.player.cmp.exp?.currentLevel}
+		const content = `%c{${Colors.BrownLight}}Level: ${window.engine.player.cmp.exp?.currentLevel}
 XP: ${window.engine.player.cmp.exp?.currentXp}
 XP for next Level: ${window.engine.player.cmp.exp?.experienceToNextLevel}
 Attack: ${window.engine.player.cmp.body?.power}
 Defense: ${window.engine.player.cmp.body?.defense}`
-		)
+
+		display.drawText(x + 2, y + 2, content)
 	}
 	handleKeyboardInput(_event: KeyboardEvent): Action | null {
 		this.nextHandler = new GameInputHandler()
@@ -245,20 +243,15 @@ export abstract class SelectIndexHandler extends BaseInputHandler {
 		if (event.key in MOVE_KEYS) {
 			const moveAmount = MOVE_KEYS[event.key]
 			let modifier = 1
+			// FIXME: Doesn't work
 			if (event.shiftKey) modifier = 5
 			if (event.ctrlKey) modifier = 10
 			if (event.altKey) modifier = 20
 
-			// FIXME: make this cleaner
-			let x = this.mousePosition.x
-			let y = this.mousePosition.y
-			let dx = moveAmount.x
-			let dy = moveAmount.y
-			x += dx * modifier
-			y += dy * modifier
-			x = Math.max(0, Math.min(x * modifier, Engine.MAP_WIDTH - 1))
-			y = Math.max(0, Math.min(y * modifier, Engine.MAP_HEIGHT - 1))
-			this.mousePosition = { x: x, y: y }
+			const pos = addXY(this.mousePosition, multiplyXY(moveAmount, modifier))
+			pos.x = Math.max(0, Math.min(pos.x * modifier, Engine.MAP_WIDTH - 1))
+			pos.y = Math.max(0, Math.min(pos.y * modifier, Engine.MAP_HEIGHT - 1))
+			this.mousePosition = pos
 			return null
 		} else if (event.key === 'Enter') {
 			return this.onIndexSelected(this.mousePosition)
@@ -306,12 +299,6 @@ export class AreaRangedAttackHandler extends SelectIndexHandler {
 
 		const startX = this.mousePosition.x - this.radius
 		const startY = this.mousePosition.y - this.radius
-		/*
-		for (let x = startX; x < this.mousePosition.x + this.radius + 1; x++) {
-			for (let y = startY; y < this.mousePosition.y + this.radius + 1; y++) {
-				display.drawOver(x, y, null, '#fff', Colors.BrownYellow)
-			}
-		}*/
 
 		display.drawOver(
 			this.mousePosition.x,
