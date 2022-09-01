@@ -56,10 +56,13 @@ export class GameScreen extends BaseScreen {
 
 	handleEnemyTurns() {
 		this.gameMap.actors.forEach((e) => {
-			if (e.cmp.body?.isAlive) {
+			if (e.cmp.body?.isAlive && e.cmp.ai) {
 				try {
+					e.cmp.ai.update()
 					//e.ai?.perform(e)
-				} catch {}
+				} catch (error) {
+					//console.log(error)
+				}
 			}
 		})
 	}

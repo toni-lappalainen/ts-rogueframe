@@ -1,3 +1,5 @@
+import { RNG } from 'rot-js'
+import { DIR } from './input-handler'
 export const generateRandomNumber = (min: number, max: number) => {
 	return Math.floor(Math.random() * (max - min + 1) + min)
 }
@@ -11,6 +13,21 @@ export const generateRandomPoint = (
 	const x = Math.floor(Math.random() * (maxX - minX + 1) + minX)
 	const y = Math.floor(Math.random() * (maxY - minY + 1) + minY)
 	return { x: x, y: y }
+}
+
+export const getRandomDir = (): Point => {
+	switch (generateRandomNumber(0, 3)) {
+		case 0:
+			return DIR.ArrowUp
+		case 1:
+			return DIR.ArrowDown
+		case 2:
+			return DIR.ArrowLeft
+		case 3:
+			return DIR.ArrowRight
+		default:
+			return { x: 0, y: 0 }
+	}
 }
 
 export const addXY = (p1: Point, p2: Point): Point => {

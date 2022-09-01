@@ -3,70 +3,63 @@ import {
 	//MeleeAction,
 	MovementAction,
 	WaitAction,
-} from '../input-handler'
+} from '../actions/actions'
 //import * as ROT from 'rot-js'
-import { Path } from 'rot-js'
+import { RNG } from 'rot-js'
 import { Entity } from '../entity'
+import { Component } from './component'
+import { addXY, generateRandomNumber, getRandomDir } from '../utils'
 
-export abstract class BaseAI implements Action {
-	path: [number, number][]
-
-	constructor() {
-		this.path = []
+export abstract class AI implements Component {
+	data: any
+	entity?: Entity
+	nextAction?: Action
+	lastDir?: Point
+	constructor(public aiType: String = 'base') {
+		this.data = {}
 	}
 
-	perform(_entity: Entity) {}
-
-	/**
-	 * Compute and return a path to the target position.
-	 *
-	 * If there is no valid path then return an empty list.
-	 *
-	 * @param destX
-	 * @param destY
-	 * @param entity
-	 */
-	calculatePathTo(destX: number, destY: number, entity: Entity) {
-		const isPassable = (x: number, y: number) =>
-			window.engine.gameMap.tiles[y][x].walkable
-		const dijkstra = new Path.Dijkstra(destX, destY, isPassable, {})
-
-		this.path = []
-
-		dijkstra.compute(entity.pos.x, entity.pos.y, (x: number, y: number) => {
-			this.path.push([x, y])
-		})
-		this.path.shift()
-	}
-}
-
-export class HostileEnemy extends BaseAI {
-	constructor() {
-		super()
+	update() {
+		this.chooseNextAction()
+		this.nextAction?.perform(this.entity!, this.entity?.gameMap!)
 	}
 
-	perform(entity: Entity) {
-		const target = window.engine.player
-		const dx = target.pos.x - entity.pos.x
-		const dy = target.pos.y - entity.pos.y
-		const distance = Math.max(Math.abs(dx), Math.abs(dy))
+	chooseNextAction() {
+		switch (this.aiType) {
+			case 'base':
+				this.guard()
+		}
+	}
 
-		if (window.engine.gameMap.tiles[entity.pos.y][entity.pos.x].visible) {
-			if (distance <= 1) {
-				//	return new MeleeAction(dx, dy).perform(entity)
+	guard() {
+		if (!this.data.guard) {
+			this.data.guard = { stay: 10, walk: 100, attack: 0 }
+		}
+		this.nextAction = (() => {
+			switch (RNG.getWeightedValue(this.data.guard)) {
+				case 'stay':
+					return new WaitAction()
+				case 'walk':
+					//FIXME: doesn't seem to work properly
+					if (
+						this.lastDir &&
+						generateRandomNumber(0, 10) < 8 &&
+						this.entity?.gameMap?.isNotBlocked(this.lastDir)
+					) {
+						return new MovementAction(this.lastDir)
+					} else {
+						this.lastDir = addXY(this.entity!.pos, getRandomDir())
+						return new MovementAction(this.lastDir)
+					}
+				case 'attack':
+					return new WaitAction()
+				default:
+					return new WaitAction()
 			}
-			this.calculatePathTo(target.pos.x, target.pos.y, entity)
-		}
+		})()
 
-		if (this.path.length > 0) {
-			const [destX, destY] = this.path[0]
-			this.path.shift()
-			return new MovementAction({
-				x: destX - entity.pos.x,
-				y: destY - entity.pos.y,
-			}).perform(entity)
+		if (this.nextAction && this.entity) {
+			this.nextAction.perform(this.entity, this.entity.gameMap!)
 		}
-
-		return new WaitAction().perform(entity)
 	}
 }

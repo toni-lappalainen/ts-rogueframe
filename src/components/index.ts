@@ -4,6 +4,7 @@ import { Item } from './Item'
 import { Inventory } from './inventory'
 import { Exp } from './exp'
 import { Equippable, Equipment } from './equips'
+import { AI } from './ai'
 
 export type CmpTypes = InstanceType<typeof componentList[number]>
 
@@ -21,6 +22,7 @@ type WithOptionalSignature = {
 	exp?: Exp
 	equippable?: Equippable
 	equipment?: Equipment
+	ai?: AI
 }
 
 export type cmpList = WithRequiredSignature & WithOptionalSignature
@@ -35,4 +37,5 @@ export const componentList = [
 	Exp,
 	Equippable,
 	Equipment,
+	AI,
 ]

@@ -65,6 +65,16 @@ export class GameMap {
 		}
 	}
 
+	isNotBlocked(pos: Point) {
+		if (
+			this.isInBounds(pos) &&
+			this.tiles[pos.y][pos.x].walkable &&
+			!this.getBlockingEntityAtLocation(pos)
+		)
+			return true
+		else return false
+	}
+
 	isInBounds(pos: Point) {
 		return 0 <= pos.x && pos.x < this.width && 0 <= pos.y && pos.y < this.height
 	}

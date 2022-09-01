@@ -32,11 +32,18 @@ const LOG_KEYS: LogMap = {
 interface DirectionMap {
 	[key: string]: Point
 }
-const MOVE_KEYS: DirectionMap = {
+export const DIR: DirectionMap = {
 	ArrowUp: { x: 0, y: -1 },
 	ArrowDown: { x: 0, y: 1 },
 	ArrowLeft: { x: -1, y: 0 },
 	ArrowRight: { x: 1, y: 0 },
+}
+
+export enum Direction {
+	Up = 'UP',
+	Down = 'DOWN',
+	Left = 'LEFT',
+	Right = 'RIGHT',
 }
 
 export enum InputState {
@@ -72,8 +79,8 @@ export class GameInputHandler extends BaseInputHandler {
 
 	handleKeyboardInput(event: KeyboardEvent): Action | null {
 		if (window.engine.player.cmp.body?.isAlive) {
-			if (event.key in MOVE_KEYS) {
-				const dir = MOVE_KEYS[event.key]
+			if (event.key in DIR) {
+				const dir = DIR[event.key]
 				return new BumpAction(dir)
 			}
 			if (event.key === 'm') {
@@ -240,8 +247,8 @@ export abstract class SelectIndexHandler extends BaseInputHandler {
 	}
 
 	handleKeyboardInput(event: KeyboardEvent): Action | null {
-		if (event.key in MOVE_KEYS) {
-			const moveAmount = MOVE_KEYS[event.key]
+		if (event.key in DIR) {
+			const moveAmount = DIR[event.key]
 			let modifier = 1
 			// FIXME: Doesn't work
 			if (event.shiftKey) modifier = 5

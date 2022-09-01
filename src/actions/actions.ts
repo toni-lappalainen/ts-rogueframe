@@ -17,7 +17,9 @@ export abstract class ActionWithDirection extends Action {
 }
 
 export class WaitAction extends Action {
-	perform(_entity: Entity) {}
+	perform(_entity: Entity) {
+		console.log(`${_entity.name} is waiting.`)
+	}
 }
 
 export class MovementAction extends ActionWithDirection {
