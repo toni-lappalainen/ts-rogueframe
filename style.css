@@ -1,13 +1,11 @@
 #app {
 	display: flex;
+	flex-direction: column;
 }
 #game {
-	width: 100%;
 }
 
 #ui {
-	width: 100%;
-	margin-left: -100%;
 }
 .crt::after {
 	content: ' ';

@@ -21,6 +21,7 @@ export class Engine {
 		this.display = new ROT.Display({
 			width: Engine.WIDTH,
 			height: Engine.HEIGHT,
+			fontSize: 16,
 			forceSquareRatio: true,
 		})
 

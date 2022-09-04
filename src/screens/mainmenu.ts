@@ -8,6 +8,7 @@ import { BaseInputHandler, GameInputHandler } from '../input-handler'
 const OPTIONS = [
 	'[N] Play a new game',
 	'[C] Continue last game', // TODO: hide this option if no save game is present
+	'[P] Procgen playground',
 ]
 
 const MENU_WIDTH = 24
@@ -30,9 +31,7 @@ export class MainMenu extends BaseScreen {
 	}
 
 	update(event: KeyboardEvent): BaseScreen {
-		if (event.key === 'n') {
-			return new GameScreen(this.display, this.player)
-		}
+		if (event.key === 'n') return new GameScreen(this.display, this.player)
 
 		this.render()
 
