@@ -5,6 +5,28 @@ import Cellular from './cellular'
 let count = 0
 const area = document.getElementById('area')
 
+let source = null
+let target = null
+
+const startConnection = (connection) => {
+	if (connection.classList.contains('dot-right') && target === null) {
+		target = connection
+	} else if (
+		connection.classList.contains('dot-left') &&
+		target !== null &&
+		source === null
+	) {
+		source = connection
+		console.log(`Connected ${target} to ${source}!`)
+		stopConnection()
+	}
+}
+
+const stopConnection = () => {
+	target = null
+	source = null
+}
+
 // event listeners for Crel elements
 crel.attrMap['on'] = (element, value) => {
 	for (let eventName in value) {
@@ -15,8 +37,9 @@ crel.attrMap['on'] = (element, value) => {
 const nodeTypes = [Cellular]
 const nodes = []
 
-const createLeftClickMenu = (pos) => {
+const createLeftClickMenu = () => {
 	const els = []
+	let name = 'node'
 	nodeTypes.forEach((node) => {
 		els.push(
 			crel(
@@ -25,94 +48,24 @@ const createLeftClickMenu = (pos) => {
 					class: 'menu-item',
 					on: {
 						click: (e) => {
-							nodes.push(
-								new Node({ x: e.pageX + 'px', y: e.pageY + 'px' }, node)
-								//	createNode({ x: e.pageX + 'px', y: e.pageY + 'px' }, node)
+							const newNode = new node(
+								{ x: e.pageX + 'px', y: e.pageY + 'px' },
+								count
 							)
+							name = newNode.name
+							nodes.push(newNode)
+							count++
+							console.log(count)
 						},
 					},
 				},
-				node.name
+				name
 			)
 		)
 	})
 
 	let element = crel('div', { id: 'menu' }, [...els])
 	area.appendChild(element)
-	return element
-}
-
-class Node {
-	element = null
-	input = null
-	output = null
-	map = null
-	values = null
-	w = 180
-	h = 180
-	ctx = null
-	tokens = []
-
-	constructor(pos, node) {
-		this.element = createNode(pos, node, this.createCanvas())
-		this.values = node.values
-		this.map = node.map
-		this.draw()
-		node.draw = this.draw
-		this.subscribe(node.topic)
-	}
-	mySubscriber = (msg, data) => {
-		this.map = data
-		this.draw()
-	}
-
-	subscribe = (topic) => {
-		this.tokens.push(PubSub.subscribe(topic, this.mySubscriber))
-	}
-
-	createCanvas = () => {
-		const canvas = document.createElement('canvas')
-		canvas.height = this.h
-		canvas.width = this.w
-		this.ctx = canvas.getContext('2d')
-
-		if (this.ctx) this.ctx.clearRect(0, 0, this.w, this.h)
-		return canvas
-	}
-
-	draw = () => {
-		if (!this.map) return
-		this.ctx.clearRect(0, 0, this.w, this.h)
-		for (let x = 0; x < this.w / 4; x++) {
-			for (let y = 0; y < this.h / 4 - 12; y++) {
-				if (this.map[x][y] === 1) this.ctx.fillRect(x * 4, y * 4, 4, 4)
-			}
-		}
-	}
-}
-
-const createNode = (pos, node, canvas) => {
-	let element = crel(
-		'div',
-		{ class: 'node' },
-		crel('div', { class: 'node-header', id: `handle${count}` }, node.name),
-		crel(
-			'div',
-			{ class: 'dots' },
-			crel('div', { class: 'dot-left' }),
-			crel('div', { class: 'dot-right' })
-		),
-		crel('div', { class: 'node-body' }, node.body)
-	)
-	element.appendChild(canvas)
-	element.style.left = pos.x
-	element.style.top = pos.y
-	area.appendChild(element)
-	const draggable = new PlainDraggable(element, {
-		handle: document.getElementById(`handle${count}`),
-	})
-	count++
-
 	return element
 }
 
@@ -167,7 +120,6 @@ const toggleMenu = (e) => {
 	//display the menu
 	contextMenu.style.visibility = 'visible'
 }
-let timer
 //same function for both events
 //event type is a data structure that defines the data contained in an event
 events.forEach((eventType) => {
@@ -178,6 +130,8 @@ events.forEach((eventType) => {
 				contextMenu.style.visibility = 'hidden'
 				return
 			}
+			if (e.target.classList.contains('dot')) return startConnection(e.target)
+			stopConnection()
 			if (e.target.id !== 'area') return
 			e.stopPropagation()
 			if (e.button === 2) return
