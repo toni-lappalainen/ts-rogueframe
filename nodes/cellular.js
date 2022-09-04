@@ -47,11 +47,11 @@ class Cellular extends Node {
 
 	generateMap = (input = null) => {
 		const array = input || this.map
-		const map = new Map.Cellular(180 / 8, 180 / 8)
+		const map = new Map.Cellular(180 / 4, 180 / 4)
 		map.randomize(this.values.ratio)
 		for (let i = 0; i < this.values.gens; i++) {
 			map.create((x, y, value) => {
-				array[x + 10][y + 10] = value
+				array[x][y] = value
 			})
 		}
 		this.map = array

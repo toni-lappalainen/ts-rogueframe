@@ -17,6 +17,7 @@ export class Node {
 	topic = null
 	name = 'node'
 	body = null
+	draggable = null
 
 	constructor(pos, count) {
 		this.onChange = {
@@ -24,7 +25,6 @@ export class Node {
 				this.values[e.target.name] = e.target.valueAsNumber
 				this.generateMap()
 				this.draw()
-				console.log(this.values)
 			},
 		}
 
@@ -32,7 +32,10 @@ export class Node {
 	}
 	generateMap = (input = null) => {}
 	mySubscriber = (msg, data) => {
-		this.map = data
+		this.input = data
+		console.log(this.input)
+		console.log('asd')
+		this.generateMap()
 		this.draw()
 	}
 
@@ -52,6 +55,7 @@ export class Node {
 
 	draw = () => {
 		if (!this.map) return
+		console.log(this.map)
 		this.ctx.clearRect(0, 0, this.w, this.h)
 		for (let x = 0; x < this.w / 4; x++) {
 			for (let y = 0; y < this.h / 4 - 12; y++) {
@@ -63,13 +67,13 @@ export class Node {
 	createNodeElement = (pos, canvas, count) => {
 		let element = crel(
 			'div',
-			{ class: 'node' },
+			{ class: 'node', id: `node${count}` },
 			crel('div', { class: 'node-header', id: `handle${count}` }, this.name),
 			crel(
 				'div',
 				{ class: 'dots' },
-				crel('div', { class: 'dot dot-left' }),
-				crel('div', { class: 'dot dot-right' })
+				crel('div', { id: `input${count}`, class: 'dot dot-left' }),
+				crel('div', { id: `output${count}`, class: 'dot dot-right' })
 			),
 			crel('div', { class: 'node-body' }, this.body)
 		)
@@ -77,9 +81,10 @@ export class Node {
 		element.style.left = pos.x
 		element.style.top = pos.y
 		area.appendChild(element)
-		const draggable = new PlainDraggable(element, {
+		this.draggable = new PlainDraggable(element, {
 			handle: document.getElementById(`handle${count}`),
 		})
+
 		//count++
 
 		return element

@@ -1,28 +1,66 @@
 import PlainDraggable from 'plain-draggable'
 import crel from 'crel'
 import Cellular from './cellular'
+import Random from './random'
+//import leaderline from 'leader-line'
+//window.leaderline
+
+const area = document.getElementById('area')
+const nodeTypes = [Cellular, Random]
+const nodes = []
 
 let count = 0
-const area = document.getElementById('area')
-
 let source = null
 let target = null
+let mouseDiv
 
+let line = null
 const startConnection = (connection) => {
-	if (connection.classList.contains('dot-right') && target === null) {
-		target = connection
+	if (connection.classList.contains('dot-right') && source === null) {
+		source = connection
+		source.style.backgroundColor = 'red'
+
+		mouseDiv = crel('div')
+		const pos = source.getBoundingClientRect()
+		mouseDiv.style.cssText = `position: absolute;top:${pos.y}px;left: ${pos.x}px;background-color: #bbb;width: 2px;height: 2px;`
+		area.appendChild(mouseDiv)
+		line = new LeaderLine(source, mouseDiv)
+		area.addEventListener('mousemove', (e) => {
+			mouseDiv.style.top = e.clientY + 'px'
+			mouseDiv.style.left = e.clientX + 'px'
+			line.position()
+		})
 	} else if (
 		connection.classList.contains('dot-left') &&
-		target !== null &&
-		source === null
+		source !== null &&
+		target === null
 	) {
-		source = connection
-		console.log(`Connected ${target} to ${source}!`)
+		target = connection
+		line.end = target
+		const targetNode = nodes.find(
+			(e) => e.element.id === target.parentElement.parentElement.id
+		)
+		const sourceNode = nodes.find(
+			(e) => (e) => e.element.id === source.parentElement.parentElement.id
+		)
+
+		targetNode.draggable.onMove = () => {
+			line.position()
+		}
+		sourceNode.draggable.onMove = () => {
+			line.position()
+		}
+
+		targetNode.subscribe(sourceNode.topic)
+
+		PubSub.publish(sourceNode.topic, sourceNode.map)
+
 		stopConnection()
 	}
 }
 
 const stopConnection = () => {
+	if (source) source.style.backgroundColor = '#bbb'
 	target = null
 	source = null
 }
@@ -33,9 +71,6 @@ crel.attrMap['on'] = (element, value) => {
 		element.addEventListener(eventName, value[eventName])
 	}
 }
-
-const nodeTypes = [Cellular]
-const nodes = []
 
 const createLeftClickMenu = () => {
 	const els = []
@@ -52,14 +87,12 @@ const createLeftClickMenu = () => {
 								{ x: e.pageX + 'px', y: e.pageY + 'px' },
 								count
 							)
-							name = newNode.name
 							nodes.push(newNode)
 							count++
-							console.log(count)
 						},
 					},
 				},
-				name
+				node.name
 			)
 		)
 	})

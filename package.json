@@ -19,6 +19,7 @@
 		"crel": "^4.2.1",
 		"drawflow": "^0.0.59",
 		"flatted": "^3.2.7",
+		"leader-line": "^1.0.7",
 		"plain-draggable": "^2.5.14",
 		"pubsub-js": "^1.9.4",
 		"regenerator-runtime": "^0.13.9",
