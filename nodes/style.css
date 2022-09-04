@@ -3,14 +3,16 @@ body {
 	width: 100vh;
 }
 
-.area {
+#area {
 	background-color: darkslategray;
 	height: 800px;
 	width: 1024px;
 	padding: 10px;
 }
 
+/* === NODES === */
 .node {
+	position: absolute;
 	display: flex; /* or inline-flex */
 	flex-direction: column;
 	height: 300px;
@@ -63,4 +65,27 @@ body {
 }
 input {
 	width: 40%;
+}
+
+/* === MENU === */
+
+#menu {
+	background-color: #ffffff;
+	box-shadow: 0 0 20px rgba(37, 40, 42, 0.22);
+	color: #1f194c;
+	width: 10em;
+	padding: 0.3em 0.1em;
+	font-size: 1.3rem;
+	position: fixed;
+	visibility: hidden;
+	z-index: 999;
+}
+
+.menu-item {
+	padding: 0.3em 1.2em;
+}
+
+.menu-item:hover {
+	background-color: rgba(44, 141, 247, 0.2);
+	cursor: pointer;
 }

@@ -20,6 +20,7 @@
 		"drawflow": "^0.0.59",
 		"flatted": "^3.2.7",
 		"plain-draggable": "^2.5.14",
+		"pubsub-js": "^1.9.4",
 		"regenerator-runtime": "^0.13.9",
 		"rot-js": "^2.2.0",
 		"uninstall": "^0.0.0",
