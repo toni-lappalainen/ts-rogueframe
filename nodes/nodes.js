@@ -15,6 +15,14 @@ let mouseDiv = crel('div')
 mouseDiv.style.position = 'absolute'
 area.appendChild(mouseDiv)
 
+const getNodeById = (id) => {
+	return nodes.find((node) => node.element.id === id)
+}
+
+const getLineById = (id) => {
+	return lines.find((line) => line.id === id)
+}
+
 const handleMouseMove = (e) => {
 	mouseDiv.style.top = e.clientY + 'px'
 	mouseDiv.style.left = e.clientX + 'px'
@@ -23,26 +31,39 @@ const handleMouseMove = (e) => {
 
 const removeLine = (node, connectionDot) => {
 	const lineToRemove = lines.find((line, index) => {
-		if (line.id === node.connectedLine) {
+		if (line.id === node.inputLine) {
 			lines.splice(index, 1)
-			return line.id === node.connectedLine
+			return line.id === node.inputLine
 		}
+	})
+	node.inputLine = null
+	nodes.forEach((node) => {
+		node.outputLines = node.outputLines.filter((value, index, arr) => {
+			return value !== lineToRemove.id
+		})
 	})
 	lineToRemove.remove()
 	connectionDot.classList.remove('dot-connected')
-	node.connectedLine = null
-	console.log()
+	resetOnMoves()
 }
 
-const getNodeById = (id) => {
-	return nodes.find((e) => e.element.id === id)
+const resetOnMoves = () => {
+	nodes.forEach((node) => {
+		node.draggable.onMove = () => {
+			node.outputLines.forEach((line) => {
+				getLineById(line).position()
+			})
+			if (node.inputLine) {
+				getLineById(node.inputLine).position()
+			}
+		}
+	})
 }
 
 const startConnection = (connection) => {
 	if (
 		connection.classList.contains('dot-left') &&
-		getNodeById(connection.parentElement.parentElement.id).connectedLine !==
-			null
+		getNodeById(connection.parentElement.parentElement.id).inputLine !== null
 	)
 		return removeLine(
 			getNodeById(connection.parentElement.parentElement.id),
@@ -69,8 +90,9 @@ const startConnection = (connection) => {
 		const targetNode = getNodeById(target.parentElement.parentElement.id)
 
 		newLine.id = sourceNode.element.id + targetNode.element.id
-		targetNode.connectedLine = newLine.id
-		//sourceNode.connectedLines.push(newLine.id)
+		targetNode.inputLine = newLine.id
+		sourceNode.outputLines.push(newLine.id)
+		//sourceNode.inputLines.push(newLine.id)
 
 		targetNode.draggable.onMove = () => {
 			newLine.position()
