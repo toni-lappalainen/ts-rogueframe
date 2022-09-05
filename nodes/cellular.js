@@ -18,7 +18,9 @@ class Cellular extends Node {
 			gens: 4,
 		}
 
-		this.map = [...Array(180 / 4)].map((e) => Array(180 / 4))
+		this.map = [...Array(this.w / this.dim)].map((e) =>
+			Array(this.h / this.dim)
+		)
 		this.body = crel(
 			'div',
 			crel('label', { for: `ratio` }, 'ratio: '),
@@ -46,7 +48,7 @@ class Cellular extends Node {
 
 	generateMap = (input = null) => {
 		const array = input || this.map
-		const map = new Map.Cellular(180 / 4, 180 / 4)
+		const map = new Map.Cellular(this.w / this.dim, this.h / this.dim)
 		map.randomize(this.values.ratio)
 		for (let i = 0; i < this.values.gens; i++) {
 			map.create((x, y, value) => {

@@ -9,8 +9,9 @@ export class Node {
 	output = null
 	map = null
 	values = null
-	w = 180
-	h = 180
+	w = 340
+	h = 340
+	dim = 4
 	ctx = null
 	tokens = []
 	onChange = null
@@ -23,7 +24,6 @@ export class Node {
 
 	constructor(pos, count) {
 		this.topic = `node${count}:render`
-		console.log(this.topic)
 		this.onChange = {
 			change: (e) => {
 				this.values[e.target.name] = e.target.valueAsNumber
@@ -60,9 +60,10 @@ export class Node {
 		if (!this.map) return
 		console.log(this.map)
 		this.ctx.clearRect(0, 0, this.w, this.h)
-		for (let x = 0; x < this.w / 4; x++) {
-			for (let y = 0; y < this.h / 4 - 12; y++) {
-				if (this.map[x][y] === 1) this.ctx.fillRect(x * 4, y * 4, 4, 4)
+		for (let x = 0; x < this.w / this.dim; x++) {
+			for (let y = 0; y < this.h / this.dim; y++) {
+				if (this.map[x][y] === 1)
+					this.ctx.fillRect(x * this.dim, y * this.dim, this.dim, this.dim)
 			}
 		}
 	}

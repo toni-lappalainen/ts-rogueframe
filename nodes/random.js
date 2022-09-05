@@ -18,7 +18,9 @@ class Random extends Node {
 			random: 30,
 		}
 
-		this.map = [...Array(180 / 4)].map((e) => Array(180 / 4))
+		this.map = [...Array(this.w / this.dim)].map((e) =>
+			Array(this.h / this.dim)
+		)
 		this.body = crel(
 			'div',
 			crel('label', { for: `random` }, 'random: '),
@@ -38,19 +40,17 @@ class Random extends Node {
 	}
 
 	generateMap = () => {
-		this.map = [...Array(180 / 4)].map((e) => Array(180 / 4))
+		this.map = [...Array(this.w / this.dim)].map((e) =>
+			Array(this.h / this.dim)
+		)
 		if (this.input) this.map = this.input
 		const array = this.map
 		console.log(this.input)
-		for (let x = 0; x < 180 / 4; x++) {
-			for (let y = 0; y < 180 / 4; y++) {
+		for (let x = 0; x < this.w / this.dim; x++) {
+			for (let y = 0; y < this.h / this.dim; y++) {
 				if (generateRandomNumber(0, 99) < this.values.random) array[x][y] = 1
 			}
 		}
-		//console.log(array)
-		//this.map = array
-		//PubSub.publish(this.topic, array)
-		//return array
 	}
 }
 export default Random

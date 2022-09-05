@@ -1,9 +1,10 @@
 import crel from 'crel'
 import Cellular from './cellular'
 import Random from './random'
+import BigCanvas from './bigcanvas'
 
 const area = document.getElementById('area')
-const nodeTypes = [Cellular, Random]
+const nodeTypes = [Cellular, Random, BigCanvas]
 const nodes = []
 const lines = []
 
@@ -220,8 +221,8 @@ events.forEach((eventType) => {
 				return
 			}
 			if (e.target.classList.contains('dot')) return startConnection(e.target)
-			if (e.target.id !== 'area') return
 			if (stopConnection()) return
+			if (e.target.id !== 'area') return
 			e.stopPropagation()
 			if (e.button === 2) return
 			//preventDefault() method stops the default action of a selected element from happening by a user

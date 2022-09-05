@@ -15,17 +15,24 @@ body {
 	position: absolute;
 	display: flex; /* or inline-flex */
 	flex-direction: column;
-	height: 300px;
+	height: fit-content;
 	width: 200px;
 	background-color: mintcream;
 	border-style: solid;
 	border-radius: 5px;
-	border-width: 1px;
+	border-width: 4px;
 	border-color: darkslategray;
+	padding: 0 4px 4px 4px;
+}
+
+.node-big-canvas {
+	height: fit-content;
+	width: fit-content;
 }
 
 .node-header {
 	padding: 5px;
+	margin: -4px;
 	padding-top: 10px;
 	padding-bottom: 25px;
 	border-top-left-radius: 5px;
@@ -41,18 +48,18 @@ body {
 	flex-direction: row;
 	padding: 5px;
 	justify-content: space-between;
+	margin-top: 5px;
 }
 .dot {
-	height: 15px;
-	width: 15px;
-
+	height: 16px;
+	width: 16px;
 	position: relative;
 	background-color: #bbb;
 	border-radius: 50%;
 }
 
 .dot-left {
-	height: 15px;
+	height: 16px;
 }
 
 .dot-right {
