@@ -18,6 +18,7 @@ export class Node {
 	name = 'node'
 	body = null
 	draggable = null
+	connectedLine = null
 
 	constructor(pos, count) {
 		this.topic = `node${count}:render`

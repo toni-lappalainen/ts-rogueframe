@@ -42,20 +42,38 @@ body {
 	padding: 5px;
 	justify-content: space-between;
 }
-
-.dot-left {
+.dot {
 	height: 15px;
 	width: 15px;
+
+	position: relative;
 	background-color: #bbb;
 	border-radius: 50%;
 }
 
+.dot-left {
+	height: 15px;
+}
+
 .dot-right {
 	align-self: flex-end;
-	height: 15px;
-	width: 15px;
-	background-color: #bbb;
-	border-radius: 50%;
+}
+
+.dot-connected {
+	background-color: green;
+}
+
+.dot-connected::after {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	content: '\d7';
+	font-size: 19px;
+	color: #fff;
+	line-height: 15px;
+	text-align: center;
 }
 
 .node-body {
@@ -67,6 +85,12 @@ input {
 	width: 40%;
 }
 
+.line-delete-icon {
+	position: absolute;
+	height: 20px;
+	width: 20px;
+	z-index: 999;
+}
 /* === MENU === */
 
 #menu {

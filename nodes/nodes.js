@@ -1,9 +1,6 @@
-import PlainDraggable from 'plain-draggable'
 import crel from 'crel'
 import Cellular from './cellular'
 import Random from './random'
-//import leaderline from 'leader-line'
-//window.leaderline
 
 const area = document.getElementById('area')
 const nodeTypes = [Cellular, Random]
@@ -24,13 +21,38 @@ const handleMouseMove = (e) => {
 	line.position()
 }
 
+const removeLine = (node, connectionDot) => {
+	const lineToRemove = lines.find((line, index) => {
+		if (line.id === node.connectedLine) {
+			lines.splice(index, 1)
+			return line.id === node.connectedLine
+		}
+	})
+	lineToRemove.remove()
+	connectionDot.classList.remove('dot-connected')
+	node.connectedLine = null
+	console.log()
+}
+
+const getNodeById = (id) => {
+	return nodes.find((e) => e.element.id === id)
+}
+
 const startConnection = (connection) => {
+	if (
+		connection.classList.contains('dot-left') &&
+		getNodeById(connection.parentElement.parentElement.id).connectedLine !==
+			null
+	)
+		return removeLine(
+			getNodeById(connection.parentElement.parentElement.id),
+			connection
+		)
 	if (connection.classList.contains('dot-right') && source === null) {
 		source = connection
-		source.style.backgroundColor = 'red'
 
 		const pos = source.getBoundingClientRect()
-		mouseDiv.style.cssText = `position: absolute;top:${pos.y}px;left: ${pos.x}px;background-color: #bbb;width: 2px;height: 2px;`
+		mouseDiv.style.cssText = `position: absolute;top:${pos.y}px;left: ${pos.x}px;width: 1px;height: 1px;`
 		line = new LeaderLine(source, mouseDiv)
 		area.addEventListener('mousemove', handleMouseMove)
 	} else if (
@@ -40,12 +62,15 @@ const startConnection = (connection) => {
 	) {
 		target = connection
 		const newLine = new LeaderLine(source, target)
-		const targetNode = nodes.find(
-			(e) => e.element.id === target.parentElement.parentElement.id
-		)
-		const sourceNode = nodes.find(
-			(e) => (e) => e.element.id === source.parentElement.parentElement.id
-		)
+		//source.classList.add('dot-connected')
+		target.classList.add('dot-connected')
+
+		const sourceNode = getNodeById(source.parentElement.parentElement.id)
+		const targetNode = getNodeById(target.parentElement.parentElement.id)
+
+		newLine.id = sourceNode.element.id + targetNode.element.id
+		targetNode.connectedLine = newLine.id
+		//sourceNode.connectedLines.push(newLine.id)
 
 		targetNode.draggable.onMove = () => {
 			newLine.position()
@@ -63,10 +88,10 @@ const startConnection = (connection) => {
 }
 
 const stopConnection = () => {
-	if (source) source.style.backgroundColor = '#bbb'
 	target = null
 	source = null
 	if (line) {
+		mouseDiv.style.cssText = `position: absolute;top:0px;left:0px;width: 1px;height:1px;`
 		area.removeEventListener('mousemove', handleMouseMove)
 		line.remove()
 		line = null
