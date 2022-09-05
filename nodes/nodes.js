@@ -8,35 +8,38 @@ import Random from './random'
 const area = document.getElementById('area')
 const nodeTypes = [Cellular, Random]
 const nodes = []
+const lines = []
 
 let count = 0
 let source = null
 let target = null
-let mouseDiv
-
 let line = null
+let mouseDiv = crel('div')
+mouseDiv.style.position = 'absolute'
+area.appendChild(mouseDiv)
+
+const handleMouseMove = (e) => {
+	mouseDiv.style.top = e.clientY + 'px'
+	mouseDiv.style.left = e.clientX + 'px'
+	line.position()
+}
+
 const startConnection = (connection) => {
 	if (connection.classList.contains('dot-right') && source === null) {
 		source = connection
 		source.style.backgroundColor = 'red'
 
-		mouseDiv = crel('div')
 		const pos = source.getBoundingClientRect()
 		mouseDiv.style.cssText = `position: absolute;top:${pos.y}px;left: ${pos.x}px;background-color: #bbb;width: 2px;height: 2px;`
-		area.appendChild(mouseDiv)
 		line = new LeaderLine(source, mouseDiv)
-		area.addEventListener('mousemove', (e) => {
-			mouseDiv.style.top = e.clientY + 'px'
-			mouseDiv.style.left = e.clientX + 'px'
-			line.position()
-		})
+		area.addEventListener('mousemove', handleMouseMove)
 	} else if (
 		connection.classList.contains('dot-left') &&
 		source !== null &&
 		target === null
 	) {
 		target = connection
-		line.end = target
+		const newLine = new LeaderLine(source, target)
 		const targetNode = nodes.find(
 			(e) => e.element.id === target.parentElement.parentElement.id
 		)
@@ -45,16 +48,16 @@ const startConnection = (connection) => {
 		)
 
 		targetNode.draggable.onMove = () => {
-			line.position()
+			newLine.position()
 		}
 		sourceNode.draggable.onMove = () => {
-			line.position()
+			newLine.position()
 		}
+		lines.push(newLine)
 
 		targetNode.subscribe(sourceNode.topic)
 
 		PubSub.publish(sourceNode.topic, sourceNode.map)
-
 		stopConnection()
 	}
 }
@@ -63,6 +66,12 @@ const stopConnection = () => {
 	if (source) source.style.backgroundColor = '#bbb'
 	target = null
 	source = null
+	if (line) {
+		area.removeEventListener('mousemove', handleMouseMove)
+		line.remove()
+		line = null
+		return true
+	}
 }
 
 // event listeners for Crel elements
@@ -164,8 +173,8 @@ events.forEach((eventType) => {
 				return
 			}
 			if (e.target.classList.contains('dot')) return startConnection(e.target)
-			stopConnection()
 			if (e.target.id !== 'area') return
+			if (stopConnection()) return
 			e.stopPropagation()
 			if (e.button === 2) return
 			//preventDefault() method stops the default action of a selected element from happening by a user

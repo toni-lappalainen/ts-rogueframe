@@ -11,9 +11,9 @@ crel.attrMap['on'] = (element, value) => {
 
 class Random extends Node {
 	constructor(pos, count) {
-		super(pos)
+		super(pos, count)
 		this.name = 'Randomizer'
-		this.topic = 'random:render'
+		//this.topic = 'random:render'
 		this.values = {
 			random: 30,
 		}

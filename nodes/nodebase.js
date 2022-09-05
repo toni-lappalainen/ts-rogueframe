@@ -20,6 +20,8 @@ export class Node {
 	draggable = null
 
 	constructor(pos, count) {
+		this.topic = `node${count}:render`
+		console.log(this.topic)
 		this.onChange = {
 			change: (e) => {
 				this.values[e.target.name] = e.target.valueAsNumber
@@ -34,7 +36,6 @@ export class Node {
 	mySubscriber = (msg, data) => {
 		this.input = data
 		console.log(this.input)
-		console.log('asd')
 		this.generateMap()
 		this.draw()
 	}

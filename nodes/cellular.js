@@ -11,9 +11,8 @@ crel.attrMap['on'] = (element, value) => {
 
 class Cellular extends Node {
 	constructor(pos, count) {
-		super(pos)
+		super(pos, count)
 		this.name = 'Cellular Automata'
-		this.topic = 'cellular:render'
 		this.values = {
 			ratio: 0.4,
 			gens: 4,
