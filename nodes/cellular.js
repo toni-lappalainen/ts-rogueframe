@@ -23,23 +23,32 @@ class Cellular extends Node {
 		)
 		this.body = crel(
 			'div',
-			crel('label', { for: `ratio` }, 'ratio: '),
-			crel('input', {
-				type: 'number',
-				name: `ratio`,
-				value: this.values.ratio,
-				min: 0,
-				max: 1.0,
-				step: 0.05,
-				on: this.onChange,
-			}),
-			crel('label', { for: `gens` }, 'generations: '),
-			crel('input', {
-				type: 'number',
-				name: `gens`,
-				value: this.values.gens,
-				on: this.onChange,
-			})
+			{ class: 'form-wrapper' },
+			crel(
+				'div',
+				{ class: 'input-wrapper' },
+				crel('label', { for: `ratio` }, 'ratio: '),
+				crel('input', {
+					type: 'number',
+					name: `ratio`,
+					value: this.values.ratio,
+					min: 0,
+					max: 1.0,
+					step: 0.05,
+					on: this.onChange,
+				})
+			),
+			crel(
+				'div',
+				{ class: 'input-wrapper' },
+				crel('label', { for: `gens` }, 'generations: '),
+				crel('input', {
+					type: 'number',
+					name: `gens`,
+					value: this.values.gens,
+					on: this.onChange,
+				})
+			)
 		)
 		this.element = this.createNodeElement(pos, this.createCanvas(), count)
 		this.generateMap()

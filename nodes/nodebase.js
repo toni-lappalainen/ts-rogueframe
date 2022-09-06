@@ -50,6 +50,8 @@ export class Node {
 		const canvas = document.createElement('canvas')
 		canvas.height = this.h
 		canvas.width = this.w
+		console.log(canvas.width)
+		canvas.classList.add('canvas')
 		this.ctx = canvas.getContext('2d')
 
 		if (this.ctx) this.ctx.clearRect(0, 0, this.w, this.h)

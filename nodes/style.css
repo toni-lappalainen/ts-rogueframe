@@ -1,13 +1,27 @@
+/* === variables === */
+
+:root {
+	--color-black: black;
+	--color-white: #fefae0;
+	--color-primary: #606c38;
+	--color-bg: #323c39;
+	--color-bg-light: #6c6a6d;
+	--color-secondary: #dda15e;
+	--color-secondary-dark: #8f563b;
+}
+/* === styles === */
+
 body {
-	height: 100vh;
-	width: 100vh;
+	margin: 0;
 }
 
 #area {
-	background-color: darkslategray;
-	height: 800px;
-	width: 1024px;
-	padding: 10px;
+	background-color: var(--color-bg);
+	height: 100vh;
+	width: 100vw;
+	color: var(--color-white);
+	padding: 20px;
+	font-size: 20px;
 }
 
 /* === NODES === */
@@ -17,11 +31,11 @@ body {
 	flex-direction: column;
 	height: fit-content;
 	width: 200px;
-	background-color: mintcream;
+	background-color: var(--color-bg-light);
 	border-style: solid;
 	border-radius: 5px;
 	border-width: 4px;
-	border-color: darkslategray;
+	border-color: var(--color-bg);
 	padding: 0 4px 4px 4px;
 }
 
@@ -34,21 +48,27 @@ body {
 	padding: 5px;
 	margin: -4px;
 	padding-top: 10px;
-	padding-bottom: 25px;
+	padding-bottom: 10px;
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
-	background-color: aqua;
+	background-color: var(--color-primary);
+	color: var(--color-white);
 	/*	height: 30%;*/
 	text-align: center;
 	font-size: 20px;
+}
+.node-body {
+	flex-grow: 4;
+	/*height: 70%;*/
+	padding: 10px;
 }
 
 .dots {
 	display: flex;
 	flex-direction: row;
-	padding: 5px;
+	padding-top: 5px;
 	justify-content: space-between;
-	margin-top: 5px;
+	margin: 5px -11px;
 }
 .dot {
 	height: 16px;
@@ -78,18 +98,39 @@ body {
 	right: 0;
 	content: '\d7';
 	font-size: 19px;
-	color: #fff;
+	color: var(--color-white);
 	line-height: 15px;
 	text-align: center;
 }
 
-.node-body {
-	flex-grow: 4;
-	/*height: 70%;*/
-	padding: 10px;
+.input-wrapper {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 4px;
+	margin-bottom: 5px;
+	border: 1px solid black;
+	border-radius: 5px;
+	background-color: lightgray;
 }
+
+.form-wrapper {
+}
+
 input {
-	width: 40%;
+	outline: none;
+	border: none;
+	width: 30%;
+	font-size: 16px;
+	background-color: lightgray;
+	/*	text-align: right;*/
+	flex-grow: 2;
+}
+
+label {
+	font-size: 18px;
+	color: black;
+	width: 60%;
 }
 
 .line-delete-icon {
@@ -97,6 +138,14 @@ input {
 	height: 20px;
 	width: 20px;
 	z-index: 999;
+}
+
+/* === CANVAS ===*/
+
+.canvas {
+	border: 1px solid black;
+	border-radius: 5px;
+	background-color: var(--color-white);
 }
 /* === MENU === */
 
