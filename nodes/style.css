@@ -172,17 +172,36 @@ label {
 
 /* === EDITOR === */
 
-.codenode {
-	position: absolute;
-	top: 150px;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	width: 600px;
-	height: 640px;
-}
-
 #editor {
+	display: flex;
+	height: 400px;
+	width: 340px;
 	background-color: var(--color-white);
 	z-index: 999;
+	color: black !important;
+	overflow: hidden;
+	position: relative;
 }
+
+.codeflask {
+	height: 100% !important;
+	width: 340px !important;
+}
+.codeflask__textarea {
+	color: black !important;
+}
+.codeflask__pre {
+	z-index: 0 !important;
+}
+/*
+.codeflask__lines {
+	width: 20px !important;
+}
+.codeflask--has-line-numbers .codeflask__flatten {
+	left: 14px !important;
+	width: calc(100% - 12px) !important;
+}
+
+.codeflask.codeflask--has-line-numbers::before {
+	width: 20px !important;
+}*/
