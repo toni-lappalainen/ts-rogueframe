@@ -16,6 +16,7 @@
 	},
 	"dependencies": {
 		"@esbuild-plugins/node-globals-polyfill": "^0.1.1",
+		"codeflask": "^1.4.1",
 		"crel": "^4.2.1",
 		"drawflow": "^0.0.59",
 		"flatted": "^3.2.7",
@@ -25,6 +26,7 @@
 		"regenerator-runtime": "^0.13.9",
 		"rot-js": "^2.2.0",
 		"uninstall": "^0.0.0",
-		"uuid": "^8.3.2"
+		"uuid": "^8.3.2",
+		"websandbox": "^0.5.3"
 	}
 }

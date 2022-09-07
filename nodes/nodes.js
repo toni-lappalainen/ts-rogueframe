@@ -1,9 +1,46 @@
 import crel from 'crel'
+import Sandbox from 'websandbox'
+import CodeFlask from 'codeflask'
 import Cellular from './cellular'
 import Random from './random'
 import BigCanvas from './bigcanvas'
 
 const area = document.getElementById('area')
+const runButton = document.getElementById('runbutton')
+
+const flask = new CodeFlask('#editor', { language: 'js', lineNumbers: true })
+const h = 85
+const w = 85
+flask.updateCode(
+	`const map = [...Array(${w})].map((e) => Array(${h}))
+// Change the code below
+for (let x = 0; x < ${w}; x++) {
+	for (let y = 0; y < ${h}; y++) {
+		if (x % 2 === 0) map[x][y] = 1
+		else map[x][y] = 0
+	}
+}
+// Change the code above`
+)
+
+runButton.onclick = () => {
+	const flaskCode = flask.getCode()
+
+	const localApi = {
+		getMap: (message) => {
+			console.log(JSON.parse(message))
+		},
+	}
+	const sandbox = Sandbox.create(localApi)
+
+	sandbox.promise.then(() => {
+		return sandbox.run(`
+						${flaskCode}
+            Websandbox.connection.remote.getMap(JSON.stringify(map));
+				`)
+	})
+}
+
 const nodeTypes = [Cellular, Random, BigCanvas]
 const nodes = []
 const lines = []
