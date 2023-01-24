@@ -68,3 +68,5 @@ export const getCircle = (center: Point, radius: number): Point[] => {
 	}
 	return coordsInCircle
 }
+
+export const perlin = () => {}
