@@ -17,8 +17,8 @@ import { Colors } from '../values';
 import { BaseScreen } from './screen';
 
 export class GameScreen extends BaseScreen {
-	public static readonly MAP_WIDTH = 80;
-	public static readonly MAP_HEIGHT = 43;
+	public static readonly MAP_WIDTH = 80 * 4;
+	public static readonly MAP_HEIGHT = 43 * 4;
 	public static readonly MAX_ROOMS = 6;
 	public static readonly MIN_ROOM_SIZE = 5;
 	public static readonly MAX_ROOM_SIZE = 30;

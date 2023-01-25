@@ -54,6 +54,7 @@ class Island {
 			const col = new Array(this.height);
 			for (let y = 0; y < this.height; y++) {
 				//	console.log(elevationMap[x][y]);
+				/*
 				switch (Math.floor(elevationMap[x][y])) {
 					case 0:
 						color = Colors.BlueDark;
@@ -64,32 +65,39 @@ class Island {
 					case 2:
 						color = Colors.Green;
 						break;
-					case 3:
+					case 5:
 						color = Colors.BrownLight;
 						break;
-					case 4:
+					case 8:
 						color = Colors.Gray;
 						break;
-					case 5:
+					case 10:
 						color = Colors.GrayLight;
 						break;
 				}
-
-				col[y] = createTile(color);
+				*/
+				const val = elevationMap[x][y] * 255;
+				//console.log(val);
+				col[y] = createTile(`rgb(${val},${val}, ${val})`);
 			}
 			this.tiles[x] = col;
 		}
 		//createTile(`rgb(255,255,${val})`);
 	};
 
-	calculateNoise = (scale: number, factor: number = 5) => {
+	calculateNoise = (
+		scale: number,
+		offsetX: number = 0,
+		offsetY: number = 0
+	) => {
 		const noiseArray = [];
 		for (let x = 0; x < this.width; x++) {
 			const col = new Array(this.height);
 			for (let y = 0; y < this.height; y++) {
-				let val = this.noise.get(x * scale, y * scale) + 1;
-				//val = Math.floor((val / 2) * factor);
-				//console.log(` ${val}`);
+				const nx = x / this.width - 0.5;
+				const ny = y / this.height - 0.5;
+				let val =
+					(this.noise.get(nx * scale + offsetX, ny * scale + offsetY) + 1) / 2;
 				col[y] = val;
 			}
 			noiseArray[x] = col;
@@ -97,12 +105,12 @@ class Island {
 		return noiseArray;
 	};
 
-	generateElevationmap(exp: number = 7, scale: number = 0.013) {
+	generateElevationmap(exp: number = 1, scale: number = 3) {
 		const elevationSum = new Array(this.width);
 		// Simplex heightmap with different frequencies
 		const elevation = this.calculateNoise(scale);
-		const elevation2 = this.calculateNoise(scale * 8);
-		const elevation3 = this.calculateNoise(scale * 16);
+		const elevation2 = this.calculateNoise(scale * 2);
+		const elevation3 = this.calculateNoise(scale * 4);
 
 		// add the noises together
 		// and do the powers
@@ -113,9 +121,9 @@ class Island {
 				//	console.log(` ${elevation3[x][y]}`);
 				const noiseSum =
 					(elevation[x][y] + elevation2[x][y] * 0.5 + elevation3[x][y] * 0.25) /
-					3;
+					1.75;
 				//console.log(noiseSum);
-				elevationSum[x][y] = Math.pow(noiseSum, exp) * 10;
+				elevationSum[x][y] = Math.pow(noiseSum, exp); // * 10;
 				//console.log(elevationSum[x][y]);
 			}
 		}
