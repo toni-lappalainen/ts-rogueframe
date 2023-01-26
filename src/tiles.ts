@@ -43,8 +43,8 @@ export const WATER_DEEP: Tile = {
 	transparent: true,
 	visible: false,
 	seen: false,
-	dark: { char: '~', fg: Colors.BlueDark, bg: Colors.Black },
-	light: { char: '~', fg: Colors.BlueDark, bg: Colors.Black },
+	dark: { char: '~', fg: Colors.BlueDark, bg: Colors.BlueDark },
+	light: { char: '~', fg: Colors.BlueDark, bg: Colors.BlueDark },
 }
 export const WATER_SHALLOW: Tile = {
 	walkable: true,
