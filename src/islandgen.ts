@@ -90,7 +90,7 @@ class Island {
 	calculateBlueNoise = (size: number) => {
 		const seed = new Date().toISOString();
 		console.log(seed);
-		const prng = alea(seed);
+		const prng = alea('2023-01-27T12:37:29.720Z');
 		let noise = createNoise2D(prng);
 		const bluenoise = [];
 		const locations: Point[] = [];
@@ -126,7 +126,7 @@ class Island {
 				if (bluenoise[xc][yc] == max && !test) {
 					// place tree at xc,yc
 					//test = true;
-					if (locations.some((l) => intersects(xc, yc, size, l))) {
+					if (locations.some((l) => intersects({ x: xc, y: yc }, l, size))) {
 						console.log('derp');
 						continue;
 					}
@@ -227,7 +227,7 @@ class Island {
 							elevation2[lx][ly] * 0.5 +
 							elevation3[lx][ly] * 0.25) /
 						1.75;
-					elevationSum[lx][ly] = Math.pow(noiseSum, 1);
+					elevationSum[lx][ly] = Math.pow(noiseSum, 2.5);
 					elevationSum[lx][ly] = this.shapeIsland(
 						x,
 						y,
@@ -284,13 +284,17 @@ function* connectRooms(
 	}
 }
 */
-const intersects = (x: number, y: number, size: number, other: any) => {
-	return (
-		x <= other.x + size &&
-		x + size >= other.x &&
-		y <= other.y + other.height &&
-		y + size >= other.y
-	);
+const intersects = (area1: Point, area2: Point, size: number) => {
+	const l1 = { x: area1.x, y: area1.y };
+	const l2 = { x: area2.x, y: area2.y };
+	const r1 = { x: area1.x + size, y: area1.y + size };
+	const r2 = { x: area2.x + size, y: area2.y + size };
+	if (l1.x > r2.x || l2.x > r1.x) return false;
+	//	if (area1.x > r2.x || area2.x > r1.x) return false;
+	if (r1.y > l2.y || r2.y > l1.y) return false;
+	//	if (area1.y > r2.y || r2.y > area1.y) return false;
+
+	return true;
 };
 export const generateIslands = (
 	mapWidth: number,
