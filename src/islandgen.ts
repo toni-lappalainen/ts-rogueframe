@@ -88,14 +88,16 @@ class Island {
 	};
 
 	calculateBlueNoise = (size: number) => {
-		const prng = alea();
+		const seed = new Date().toISOString();
+		console.log(seed);
+		const prng = alea(seed);
 		let noise = createNoise2D(prng);
 		const bluenoise = [];
 		const locations: Point[] = [];
 		const R = 6;
 		const w = this.width - size;
 		const h = this.height - size;
-		console.log(w, h);
+		let test = false;
 		for (let x = 0; x < w; x++) {
 			const col = new Array(h);
 			for (let y = 0; y < h; y++) {
@@ -121,10 +123,15 @@ class Island {
 						}
 					}
 				}
-				if (bluenoise[xc][yc] == max) {
+				if (bluenoise[xc][yc] == max && !test) {
 					// place tree at xc,yc
+					//test = true;
+					if (locations.some((l) => intersects(xc, yc, size, l))) {
+						console.log('derp');
+						continue;
+					}
 					locations.push({ x: xc, y: yc });
-					console.log(yc, xc);
+					console.log(xc, yc);
 				}
 			}
 		}
@@ -168,6 +175,7 @@ class Island {
 
 		let d = Math.min(1, (Math.pow(nx, 2) + Math.pow(ny, 2)) / Math.sqrt(2));
 		d = d * factor;
+
 		return (elevation + (1 - d)) / 2;
 	};
 
@@ -175,7 +183,8 @@ class Island {
 		exp: number = 2,
 		scale: number = 4,
 		shapeFactor1 = 1,
-		shapeFactor2 = 1
+		shapeFactor2 = 1,
+		margin = 100
 	) {
 		const elevationSum = new Array(this.width);
 
@@ -189,7 +198,7 @@ class Island {
 
 		// add the noises together
 		// and do the powers
-		const locations = this.calculateBlueNoise(100);
+		const locations = this.calculateBlueNoise(margin);
 		for (let x = 0; x < this.width; x++) {
 			const col = new Array(this.height);
 			for (let y = 0; y < this.height; y++) {
@@ -201,36 +210,32 @@ class Island {
 					1.75;
 				//console.log(noiseSum);
 				elevationSum[x][y] = Math.pow(noiseSum, exp); // * 10;
-
-				/*
-				if (x >= 20 && x < 100 && y >= 20 && y < 100) {
-					elevationSum[x][y] = Math.pow(noiseSum, 2);
-					elevationSum[x][y] = this.shapeIsland(
-						x,
-						y,
-						elevationSum[x][y],
-						3,
-						80,
-						80
-					);
-				}
-			*/
 			}
 		}
 		locations.forEach((location) => {
-			for (let x = location.x; x < location.x + 100; x++) {
-				for (let y = location.y; y < location.y + 100; y++) {
-					elevationSum[x][y] = 0.7; //elevationSum[x][y] + 1;
-					/*
-					elevationSum[x][y] = this.shapeIsland(
+			const w = Math.random() * (margin - margin / 2 + 1) + margin / 2;
+			const h = Math.random() * (margin - margin / 2 + 1) + margin / 2;
+
+			// for (let x = location.x; x < location.x + 20; x++) {
+			for (let x = 0; x < w; x++) {
+				// for (let y = location.y; y < location.y + 20; y++) {
+				for (let y = 0; y < h; y++) {
+					const lx = location.x + x;
+					const ly = location.y + y;
+					noiseSum =
+						(elevation[lx][ly] +
+							elevation2[lx][ly] * 0.5 +
+							elevation3[lx][ly] * 0.25) /
+						1.75;
+					elevationSum[lx][ly] = Math.pow(noiseSum, 1);
+					elevationSum[lx][ly] = this.shapeIsland(
 						x,
 						y,
-						elevationSum[x][y],
-						3,
-						80,
-						80
+						elevationSum[lx][ly],
+						2,
+						w,
+						h
 					);
-					*/
 				}
 			}
 		});
@@ -279,11 +284,13 @@ function* connectRooms(
 	}
 }
 */
-const intersects = (x: number, y: number, w: number, h: number, other: any) => {
-	x <= other.x + other.width &&
-		x + w >= other.x &&
+const intersects = (x: number, y: number, size: number, other: any) => {
+	return (
+		x <= other.x + size &&
+		x + size >= other.x &&
 		y <= other.y + other.height &&
-		y + h >= other.y;
+		y + size >= other.y
+	);
 };
 export const generateIslands = (
 	mapWidth: number,
