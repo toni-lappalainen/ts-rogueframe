@@ -13,11 +13,13 @@ export interface Tile {
 	seen: boolean
 	dark: Graphic
 	light: Graphic
+	name?: string
 }
 
 export const createTile = (
 	bg: string = Colors.Transparent,
-	fg: string = Colors.Transparent
+	fg: string = Colors.Transparent,
+	name: string = ''
 ): Tile => {
 	return {
 		walkable: true,
@@ -26,6 +28,7 @@ export const createTile = (
 		seen: false,
 		dark: { char: ' ', fg: fg, bg: bg },
 		light: { char: ' ', fg: fg, bg: bg },
+		name: name,
 	}
 }
 
