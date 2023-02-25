@@ -1,7 +1,7 @@
 import * as ROT from 'rot-js'
 import { Entity } from './entity'
 import type { Tile } from './tiles'
-import { WALL } from './tiles'
+import { MOUNTAIN as WALL } from './tiles'
 import { Display } from 'rot-js'
 import { Colors } from './values'
 import { isEqual } from './utils'

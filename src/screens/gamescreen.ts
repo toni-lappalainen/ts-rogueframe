@@ -15,21 +15,24 @@ import { renderFrameWithTitle, renderHearts, renderInventory } from '../render'
 import { ImpossibleException } from '../messagelog'
 import { Colors } from '../values'
 import { BaseScreen } from './screen'
+import { Tribe, generateTribes } from '../gameplay/tribes'
+import * as tiles from '../tiles'
 
 export class GameScreen extends BaseScreen {
-	public static readonly MAP_WIDTH = 50 * 10
-	public static readonly MAP_HEIGHT = 50 * 8
+	public static readonly MAP_WIDTH = 80 * 1.5 //* 10
+	public static readonly MAP_HEIGHT = 50 * 1.5 // * 8
 	public static readonly MAX_ROOMS = 12
-	public static readonly MIN_ROOM_SIZE = 40
-	public static readonly MAX_ROOM_SIZE = 100
+	public static readonly MIN_ROOM_SIZE = 3
+	public static readonly MAX_ROOM_SIZE = 12
 	public static readonly MAX_MONSTERS_PER_ROOM = 2
 	public static readonly MAX_ITEMS_PER_ROOM = 2
 
-	public static readonly MAX_ISLANDS = 22
+	public static readonly MAX_ISLANDS = 8
 
 	inputHandler: BaseInputHandler
 	gameMap!: GameMap
 	worldMap!: WorldMap
+	tribes!: Tribe[]
 
 	constructor(
 		display: Display,
@@ -37,12 +40,9 @@ export class GameScreen extends BaseScreen {
 		public currentFloor: number = 0
 	) {
 		super(display, player)
-		//this.generateFloor();
 		this.generateWorld()
 
 		this.inputHandler = new GameInputHandler()
-		//this.gameMap.updateFov(this.player);
-		//	this.player.get('body').takeDamage(6)
 	}
 
 	generateWorld(): void {
@@ -54,6 +54,13 @@ export class GameScreen extends BaseScreen {
 			GameScreen.MAX_ROOM_SIZE,
 			this.display
 		)
+		this.tribes = generateTribes(this.worldMap.islands)
+		console.log(this.tribes)
+		this.tribes.forEach((tribe) => {
+			tribe.island.locations.forEach((loc) => {
+				this.worldMap.tiles[loc.x][loc.y] = tiles.TEST
+			})
+		})
 	}
 
 	generateFloor(): void {

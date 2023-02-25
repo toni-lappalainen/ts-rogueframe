@@ -1,4 +1,9 @@
-import { FLOOR, WALL, Tile, STAIRS_DOWN } from './tiles'
+import {
+	SAND as FLOOR,
+	MOUNTAIN as WALL,
+	Tile,
+	FOREST as STAIRS_DOWN,
+} from './tiles'
 import { GameMap } from './map'
 import { Display } from 'rot-js'
 import { Entity, spawnEntity } from './entity'

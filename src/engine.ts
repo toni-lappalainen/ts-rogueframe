@@ -7,10 +7,10 @@ import { MainMenu } from './screens/mainmenu'
 import { GameScreen } from './screens/gamescreen'
 
 export class Engine {
-	public static readonly WIDTH = 80 * 8
-	public static readonly HEIGHT = 50 * 8
-	public static readonly MAP_WIDTH = 80 * 2
-	public static readonly MAP_HEIGHT = 43 * 2
+	public static readonly WIDTH = 80 * 1.5 //* 8
+	public static readonly HEIGHT = 50 * 1.5 //* 8
+	public static readonly MAP_WIDTH = 80 * 1.5 //* 2
+	public static readonly MAP_HEIGHT = 43 * 1.5 //* 2
 
 	display: ROT.Display
 	inputHandler: BaseInputHandler
@@ -22,7 +22,7 @@ export class Engine {
 		this.display = new ROT.Display({
 			width: Engine.WIDTH,
 			height: Engine.HEIGHT,
-			fontSize: 2,
+			fontSize: 8,
 			forceSquareRatio: true,
 		})
 

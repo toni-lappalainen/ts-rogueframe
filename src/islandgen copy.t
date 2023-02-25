@@ -1,16 +1,11 @@
-import { Tile } from './tiles'
-import * as tiles from './tiles'
+/*
+import { FLOOR, WALL, Tile, createTile } from './tiles'
 import { Colors } from './values'
 import { WorldMap } from './overworld'
 import { Display, Noise } from 'rot-js'
 import { createNoise2D } from 'simplex-noise'
 import alea from 'alea'
-import {
-	generateRandomNumber,
-	isEqual,
-	generateRandomPoint,
-	createMatrix,
-} from './utils'
+import { generateRandomNumber, isEqual, generateRandomPoint } from './utils'
 
 interface Bounds {
 	x1: number
@@ -19,19 +14,23 @@ interface Bounds {
 	y2: number
 }
 
-export class Island {
-	locations: Point[]
-	constructor() {
-		this.locations = []
+interface Island {
+	location: Point
+	width: number
+	height: number
+	tiles?: {
+		green: number
+		darkGreen: number
+		yellow: number
+		brown: number
+		gray: number
+		mountain: number
 	}
 }
 
 class IslandWorld {
 	tiles: Tile[][]
 	islands: Island[]
-	margin: number = 10
-	grid: any
-	islandAmount: number
 	//noise: any
 	constructor(
 		public x: number,
@@ -43,13 +42,9 @@ class IslandWorld {
 		public factor1: number,
 		public factor2: number
 	) {
-		this.islandAmount = 0
 		this.islands = new Array()
 		this.tiles = new Array(this.width)
-		this.grid = createMatrix(this.width, this.height, 0)
-		while (this.islandAmount < 5) {
-			this.createBiomes()
-		}
+		this.createBiomes()
 	}
 
 	getTiles(): Tile[][] {
@@ -79,22 +74,7 @@ class IslandWorld {
 		}
 	}
 
-	checkNeighbours = (tiles: any[], distance: Number = 1) => {
-		tiles.forEach((tile) => {
-			const connected = []
-
-			for (let x = tile.x - 1; x < tile.x + 1; x++) {
-				for (let y = tile.y; y < this.height; y++) {}
-			}
-		})
-	}
-
 	createBiomes = () => {
-		this.islandAmount = 0
-		this.grid = createMatrix(this.width, this.height, 0)
-		this.islands = new Array()
-		this.tiles = new Array(this.width)
-
 		const elevationMap = this.generateElevationmap(
 			this.exp,
 			this.scale,
@@ -102,13 +82,10 @@ class IslandWorld {
 			this.factor2
 		)
 		const biomeMap = this.generateBiomeMap()
-		const landTiles = []
-		console.log(this.grid.length, this.grid[0].length)
-		console.log(this.width, this.height)
 
 		let color //= Colors.Black
-		let tile: Tile = tiles.WATER_DEEP
-		//const grid: number[][] = new Array(this.width)
+		console.log(this.height)
+
 		for (let x = 0; x < this.width; x++) {
 			const col = new Array(this.height)
 			for (let y = 0; y < this.height; y++) {
@@ -121,95 +98,46 @@ class IslandWorld {
 					temp =
 						temp + Math.round(100 * Math.pow(1 - y / this.height, 2)) / 1000
 
-				if (temp < 0.5) tile = tiles.WATER_DEEP
-				//	color = Colors.BlueDark
-				else if (temp < 0.56) tile = tiles.WATER_SHALLOW // color = Colors.Blue
+				if (temp < 0.5)
+					//console.log(val)
+					color = Colors.BlueDark
+				else if (temp < 0.56) color = Colors.Blue
 				else if (temp < 0.65) {
-					if (bio < 0.2) tile = tiles.FOREST //color = Colors.DarkGreen
-					else if (bio < 0.7) tile = tiles.MEADOW //color = Colors.Green
-					else tile = tiles.SAND // color = Colors.BrownYellow
+					console.log(bio)
+					if (bio < 0.2) color = Colors.DarkGreen
+					else if (bio < 0.7) color = Colors.Green
+					else color = Colors.BrownYellow
 				} else if (temp < 0.75) {
-					if (bio < 0.2) tile = tiles.SAND // color = Colors.BrownYellow
-					//	else if (bio < 0.3) color = Colors.BrownLight
-					else if (bio < 0.5) tile = tiles.MEADOW // color = Colors.Green
-					else tile = tiles.FOREST //color = Colors.DarkGreen
+					if (bio < 0.2) color = Colors.BrownYellow
+					else if (bio < 0.3) color = Colors.BrownLight
+					else if (bio < 0.5) color = Colors.Green
+					else color = Colors.DarkGreen
 				} else if (temp < 0.8) {
-					if (bio < 0.7) tile = tiles.MOUNTAIN // color = Colors.Gray
-					else tile = tiles.FOREST // color = Colors.DarkGreen
+					if (bio < 0.7) color = Colors.Gray
+					else color = Colors.DarkGreen
 					//	color = Colors.Black
 				} else if (temp < 1) {
-					if (bio < 0.8) tile = tiles.MOUNTAIN // color = Colors.Gray
-					else tile = tiles.SNOW //color = Colors.GrayLight
+					if (bio < 0.8) color = Colors.Gray
+					else color = Colors.GrayLight
 				}
-				if (temp >= 0.5) this.grid[x][y] = 1
 
-				col[y] = tile
+				//color = `rgb(${clr}, ${clr}, ${clr})`
+
+				col[y] = createTile(color)
 			}
 			this.tiles[x] = col
 		}
 
-		for (let x = 0; x < this.width; x++) {
-			for (let y = 0; y < this.height; y++) {
-				if (this.grid[x][y] === 1) {
-					let island = this.fill(x, y, 1)
-					this.islands.push(island)
-					console.log(island?.locations.length)
-					if (island?.locations.length > 50) this.islandAmount++
+		this.islands.forEach((island) => {
+			const loc = island.location
+			const w = island.width
+			const h = island.height
+			for (let x = loc.x; x < loc.x + w; x++) {
+				for (let y = loc.y; y < loc.y + h; y++) {
+					//	if (this.tiles[x][y])
 				}
 			}
-		}
-		console.log('islandAmount: ', this.islandAmount)
-	}
-
-	//TODO: collect islands
-
-	fill = (x: number, y: number, value: number = 1) => {
-		let stack = [{ x, y, value }]
-
-		const island: Island = {
-			locations: [],
-		}
-
-		while (stack.length > 0) {
-			let loc = stack.pop()
-			if (!loc) return
-
-			let lx = loc.x
-			while (this.isValidSquare(lx, loc.y, loc.value)) {
-				island.locations!.push({ x: lx, y: loc.y })
-				this.grid[lx][loc.y] = 2
-				lx--
-			}
-
-			let rx = loc.x + 1
-			while (this.isValidSquare(rx, loc.y, loc.value)) {
-				island.locations!.push({ x: rx, y: loc.y })
-				this.grid[rx][loc.y] = 2
-				rx++
-			}
-
-			this.scan(lx, rx - 1, loc.y + 1, stack, value)
-			this.scan(lx, rx - 1, loc.y - 1, stack, value)
-		}
-		return island
-	}
-
-	isValidSquare = (x: number, y: number, isLand: number = 1) => {
-		return (
-			x >= 0 &&
-			x < this.width &&
-			y >= 0 &&
-			y < this.height &&
-			this.grid[x][y] === isLand
-		)
-	}
-
-	scan(lx: number, rx: number, y: number, stack: any[], value: number = 1) {
-		for (let i = lx; i < rx; i++) {
-			if (this.isValidSquare(i, y, value)) {
-				stack.push({ x: i, y, value })
-			}
-		}
+		})
 	}
 
 	calculateBlueNoise = (size: number) => {
@@ -219,9 +147,9 @@ class IslandWorld {
 		let noise = createNoise2D(prng)
 		const bluenoise = []
 		const locations: Point[] = []
-		const R = 1
-		const w = this.width
-		const h = this.height
+		const R = 6
+		const w = this.width - size
+		const h = this.height - size
 		for (let x = 0; x < w; x++) {
 			const col = new Array(h)
 			for (let y = 0; y < h; y++) {
@@ -250,7 +178,7 @@ class IslandWorld {
 				// check overlaps and add islands that are apart from each other
 				if (bluenoise[xc][yc] == max) {
 					const overlap = locations.some((l) =>
-						intersects({ x: xc, y: yc }, l, size * 2)
+						intersects({ x: xc, y: yc }, l, size)
 					)
 					if (!overlap) locations.push({ x: xc, y: yc })
 				}
@@ -301,7 +229,7 @@ class IslandWorld {
 	}
 
 	generateBiomeMap(exp: number = 1, scale: number = 4) {
-		const prng = alea()
+		const prng = alea('seed')
 		let noise = createNoise2D(prng)
 		// Simplex heightmap with different frequencies
 		const biome = this.calculateNoise(noise, scale)
@@ -332,48 +260,46 @@ class IslandWorld {
 		exp: number = 2,
 		scale: number = 6,
 		shapeFactor1 = 1,
-		shapeFactor2 = 1
-		//	margin = this.margin
+		shapeFactor2 = 1,
+		margin = 120
 	) {
 		const elevationSum = new Array(this.width)
 
-		const prng = alea()
+		const prng = alea('seed')
 		let noise = createNoise2D(prng)
 		// Simplex heightmap with different frequencies
 		const elevation = this.calculateNoise(noise, scale)
-		const elevation2 = this.calculateNoise(noise, scale * 1)
-		const elevation3 = this.calculateNoise(noise, scale * 4)
+		const elevation2 = this.calculateNoise(noise, scale * 4)
+		const elevation3 = this.calculateNoise(noise, scale * 8)
 		let noiseSum
 
 		// add the noises together
 		// and do the powers
-		const locations = this.calculateBlueNoise(this.margin)
+		const locations = this.calculateBlueNoise(margin)
 		for (let x = 0; x < this.width; x++) {
 			const col = new Array(this.height)
 			for (let y = 0; y < this.height; y++) {
 				elevationSum[x] = col
 				//	console.log(` ${elevation3[x][y]}`);
-				elevation[x][y] = this.shapeIsland(x, y, elevation[x][y], shapeFactor1)
+				//	elevation[x][y] = this.shapeIsland(x, y, elevation[x][y], shapeFactor1)
 				noiseSum =
 					(elevation[x][y] + elevation2[x][y] * 0.5 + elevation3[x][y] * 0.25) /
 					1.75
 				//console.log(noiseSum);
-				elevationSum[x][y] = Math.pow(noiseSum, exp * 1) // * 10;
+				elevationSum[x][y] = Math.pow(noiseSum, exp) // * 10;
 			}
 		}
 		locations.forEach((location: any) => {
-			const w =
-				Math.random() * (this.margin - this.margin / 2) + this.margin / 2
-			const h =
-				Math.random() * (this.margin - this.margin / 2) + this.margin / 2
+			const w = Math.random() * (margin - margin / 2) + margin / 2
+			const h = Math.random() * (margin - margin / 2) + margin / 2
 
-			const exp = Math.random() * (20 - 1) + 1
-			const islandFactor = Math.random() * (3 - 1) + 1
+			const exp = Math.random() * (3 - 1) + 1
+			const islandFactor = Math.random() * (3 - 1.5) + 1
 			let size = 0
 			// for (let x = location.x; x < location.x + 20; x++) {
-			for (let x = 0; x < w - this.margin; x++) {
+			for (let x = 0; x < w; x++) {
 				// for (let y = location.y; y < location.y + 20; y++) {
-				for (let y = 0; y < h - this.margin; y++) {
+				for (let y = 0; y < h; y++) {
 					const lx = location.x + x
 					const ly = location.y + y
 
@@ -393,12 +319,21 @@ class IslandWorld {
 						w,
 						h
 					)
-					const val = elevationSum[lx][ly]
+
+					const val = Math.floor(elevationSum[lx][ly] * 10)
 					//console.log(val)
 					if (val >= 6) size++
 				}
 			}
-			//console.log(size)
+			if (size >= 320) {
+				const island: Island = {
+					location,
+					width: w,
+					height: h,
+				}
+				this.islands.push(island)
+			}
+			console.log(size)
 		})
 		//this.calculateBlueNoise();
 		return elevationSum
@@ -444,6 +379,8 @@ function* connectRooms(
 	}
 }
 */
+
+/*
 const intersects = (area1: Point, area2: Point, size: number) => {
 	const a = { x1: area1.x, y1: area1.y, x2: area1.x + size, y2: area1.y + size }
 	const b = { x1: area2.x, y1: area2.y, x2: area2.x + size, y2: area2.y + size }
@@ -465,9 +402,37 @@ export const generateIslands = (
 	display: Display
 ): WorldMap => {
 	const world = new WorldMap(mapWidth, mapHeight, display)
-	const islandWorld = new IslandWorld(0, 0, mapWidth, mapHeight, 3.5, 2, 0, 0)
-	world.setTiles(islandWorld.getTiles())
-	world.setIslands(islandWorld.islands)
+	const island = new IslandWorld(0, 0, mapWidth, mapHeight, 4, 10, 0, 0)
+	world.setTiles(island.getTiles())
 
-	return world
-}
+	const islands: any[] = []
+
+	/*
+	for (let count = 0; count < 0; count++) {
+		const exp = Math.random() * (1 - 0.5 + 1) + 1;
+		const scale = Math.random() * (1 - 1 + 1) + 1;
+		const factor1 = Math.random() * (3 - 1 + 1) + 1;
+		const factor2 = Math.random() * (3 - 1 + 1) + 1;
+		const width = generateRandomNumber(minSize, maxSize);
+		//	const height = generateRandomNumber(minSize, maxSize)
+		const height = width;
+
+		const x = generateRandomNumber(0, mapWidth - width - 1);
+		const y = generateRandomNumber(0, mapHeight - height - 1);
+
+		const newIsland = new Island(x, y, width, height, exp, scale, 1, 1);
+
+		if (islands.some((r) => r.intersects(newIsland))) {
+			continue;
+		}
+
+		world.addRoom(x, y, newIsland.getTiles());
+		islands.push(newIsland);
+	}
+	*/
+
+//const islandMap = new Island(mapWidth, mapHeight)
+//world.setTiles(islandMap.getTiles())
+
+//	return world
+//}

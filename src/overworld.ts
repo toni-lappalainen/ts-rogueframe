@@ -4,6 +4,7 @@ import { WATER_DEEP } from './tiles'
 import { Display } from 'rot-js'
 import { Colors } from './values'
 import { isEqual } from './utils'
+import { Island } from './islandgen'
 
 export const serializeWorld = (map: WorldMap) => {
 	const entityList: string[] = []
@@ -18,6 +19,7 @@ export const serializeWorld = (map: WorldMap) => {
 export class WorldMap {
 	readonly id: string
 	tiles: Tile[][]
+	islands: Island[] = []
 	public static readonly FOV_RADIUS = 20
 
 	constructor(
@@ -42,6 +44,10 @@ export class WorldMap {
 				this.tiles[x][y] = tiles[x][y]
 			}
 		}
+	}
+
+	public setIslands = (islands: Island[]) => {
+		this.islands = islands
 	}
 
 	public get gameMap(): WorldMap {
