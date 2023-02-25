@@ -102,19 +102,15 @@ class IslandWorld {
 			this.factor2
 		)
 		const biomeMap = this.generateBiomeMap()
-		const landTiles = []
 		console.log(this.grid.length, this.grid[0].length)
 		console.log(this.width, this.height)
 
-		let color //= Colors.Black
 		let tile: Tile = tiles.WATER_DEEP
-		//const grid: number[][] = new Array(this.width)
 		for (let x = 0; x < this.width; x++) {
 			const col = new Array(this.height)
 			for (let y = 0; y < this.height; y++) {
 				const elv = elevationMap[x][y]
 				const bio = biomeMap[x][y]
-				const clr = Math.floor(biomeMap[x][y] * 255)
 
 				let temp = elv
 				if (elv >= 0.56)
@@ -122,24 +118,22 @@ class IslandWorld {
 						temp + Math.round(100 * Math.pow(1 - y / this.height, 2)) / 1000
 
 				if (temp < 0.5) tile = tiles.WATER_DEEP
-				//	color = Colors.BlueDark
-				else if (temp < 0.56) tile = tiles.WATER_SHALLOW // color = Colors.Blue
+				else if (temp < 0.56) tile = tiles.WATER_SHALLOW
 				else if (temp < 0.65) {
-					if (bio < 0.2) tile = tiles.FOREST //color = Colors.DarkGreen
-					else if (bio < 0.7) tile = tiles.MEADOW //color = Colors.Green
-					else tile = tiles.SAND // color = Colors.BrownYellow
+					if (bio < 0.2) tile = tiles.FOREST
+					else if (bio < 0.7) tile = tiles.MEADOW
+					else tile = tiles.SAND
 				} else if (temp < 0.75) {
-					if (bio < 0.2) tile = tiles.SAND // color = Colors.BrownYellow
-					//	else if (bio < 0.3) color = Colors.BrownLight
-					else if (bio < 0.5) tile = tiles.MEADOW // color = Colors.Green
-					else tile = tiles.FOREST //color = Colors.DarkGreen
+					if (bio < 0.2) tile = tiles.SAND
+					//	else if (bio < 0.3)
+					else if (bio < 0.5) tile = tiles.MEADOW
+					else tile = tiles.FOREST
 				} else if (temp < 0.8) {
-					if (bio < 0.7) tile = tiles.MOUNTAIN // color = Colors.Gray
-					else tile = tiles.FOREST // color = Colors.DarkGreen
-					//	color = Colors.Black
+					if (bio < 0.7) tile = tiles.MOUNTAIN
+					else tile = tiles.FOREST
 				} else if (temp < 1) {
-					if (bio < 0.8) tile = tiles.MOUNTAIN // color = Colors.Gray
-					else tile = tiles.SNOW //color = Colors.GrayLight
+					if (bio < 0.8) tile = tiles.MOUNTAIN
+					else tile = tiles.SNOW
 				}
 				if (temp >= 0.5) this.grid[x][y] = 1
 
@@ -158,10 +152,7 @@ class IslandWorld {
 				}
 			}
 		}
-		console.log('islandAmount: ', this.islandAmount)
 	}
-
-	//TODO: collect islands
 
 	fill = (x: number, y: number, value: number = 1) => {
 		let stack = [{ x, y, value }]
@@ -348,6 +339,7 @@ class IslandWorld {
 		// add the noises together
 		// and do the powers
 		const locations = this.calculateBlueNoise(this.margin)
+
 		for (let x = 0; x < this.width; x++) {
 			const col = new Array(this.height)
 			for (let y = 0; y < this.height; y++) {
@@ -369,7 +361,6 @@ class IslandWorld {
 
 			const exp = Math.random() * (20 - 1) + 1
 			const islandFactor = Math.random() * (3 - 1) + 1
-			let size = 0
 			// for (let x = location.x; x < location.x + 20; x++) {
 			for (let x = 0; x < w - this.margin; x++) {
 				// for (let y = location.y; y < location.y + 20; y++) {
@@ -393,12 +384,8 @@ class IslandWorld {
 						w,
 						h
 					)
-					const val = elevationSum[lx][ly]
-					//console.log(val)
-					if (val >= 6) size++
 				}
 			}
-			//console.log(size)
 		})
 		//this.calculateBlueNoise();
 		return elevationSum
@@ -465,7 +452,7 @@ export const generateIslands = (
 	display: Display
 ): WorldMap => {
 	const world = new WorldMap(mapWidth, mapHeight, display)
-	const islandWorld = new IslandWorld(0, 0, mapWidth, mapHeight, 3.5, 2, 0, 0)
+	const islandWorld = new IslandWorld(0, 0, mapWidth, mapHeight, 3.5, 3, 0, 0)
 	world.setTiles(islandWorld.getTiles())
 	world.setIslands(islandWorld.islands)
 

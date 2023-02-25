@@ -4,6 +4,7 @@ import { isEqual } from './utils'
 
 import { Colors } from './values'
 import { Inventory } from './components/inventory'
+import { Tile } from './tiles'
 
 const drawColoredBar = (
 	display: Display,
@@ -15,6 +16,35 @@ const drawColoredBar = (
 ) => {
 	for (let pos = x; pos < x + width; pos++) {
 		display.draw(pos, y, char, color, color)
+	}
+}
+
+export const renderUI = (display: Display, data: string[]) => {
+	console.log(data.length)
+	for (let i = 0; i < data.length; i++) {
+		display.drawText(2, i + 1, data[i], 20)
+	}
+}
+
+export const renderMinimap = (
+	display: Display,
+	center: Point,
+	data: Tile[][],
+	size: number = 42
+) => {
+	let lx = center.x - size / 2
+	let ly = center.y - 8
+	for (let x = 0; x < size + 1; x++) {
+		for (let y = 0; y < size - 25; y++) {
+			let char = ''
+			let tile
+			if (data[lx + x] === undefined || data[lx + x][ly + y] === undefined)
+				tile = Colors.Black
+			else tile = data[lx + x][ly + y].dark.bg
+
+			if (lx + x === center.x && ly + y === center.y) char = 'X'
+			display.drawOver(x + 1, y + 20, char, Colors.White, tile)
+		}
 	}
 }
 

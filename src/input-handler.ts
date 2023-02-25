@@ -140,6 +140,25 @@ Defense: ${window.engine.player.cmp.body?.defense}`
 	}
 }
 
+export class NewGameInputHandler extends BaseInputHandler {
+	constructor() {
+		super()
+	}
+
+	onRender(display: Display) {
+		const title = 'New Game'
+		const width = title.length + 10
+		const height = 20
+
+		renderFrameWithTitle(25, 25, width, height, title)
+		display.drawText(27, 27, 'derp')
+	}
+	handleKeyboardInput(_event: KeyboardEvent): Action | null {
+		this.nextHandler = new GameInputHandler()
+		return null
+	}
+}
+
 export class LogInputHandler extends BaseInputHandler {
 	constructor() {
 		super(InputState.Log)

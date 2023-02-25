@@ -7,12 +7,14 @@ import { MainMenu } from './screens/mainmenu'
 import { GameScreen } from './screens/gamescreen'
 
 export class Engine {
-	public static readonly WIDTH = 80 * 1.5 //* 8
-	public static readonly HEIGHT = 50 * 1.5 //* 8
+	public static readonly WIDTH = 80 * 4.5 //* 8
+	public static readonly HEIGHT = 50 * 6 //* 8
 	public static readonly MAP_WIDTH = 80 * 1.5 //* 2
 	public static readonly MAP_HEIGHT = 43 * 1.5 //* 2
 
 	display: ROT.Display
+	uiDisplay: ROT.Display
+
 	inputHandler: BaseInputHandler
 	screen: BaseScreen
 	player: Entity
@@ -22,14 +24,22 @@ export class Engine {
 		this.display = new ROT.Display({
 			width: Engine.WIDTH,
 			height: Engine.HEIGHT,
-			fontSize: 8,
+			fontSize: 2,
 			forceSquareRatio: true,
+		})
+
+		this.uiDisplay = new ROT.Display({
+			width: Engine.WIDTH / 8,
+			height: Engine.HEIGHT / 8,
+			fontSize: 16,
 		})
 
 		this.player = spawnEntity(playerData)
 
 		const container = this.display.getContainer()!
+		const uiContainer = this.uiDisplay.getContainer()!
 		document.getElementById('game')?.appendChild(container)
+		document.getElementById('game')?.appendChild(uiContainer)
 
 		window.addEventListener('keydown', (event) => {
 			this.update(event)
@@ -49,8 +59,8 @@ export class Engine {
 			//handleMouse(event, this.inputHandler.mousePosition)
 		})
 
-		//this.screen = new MainMenu(this.display, this.player)
-		this.screen = new GameScreen(this.display, this.player)
+		// this.screen = new MainMenu(this.display, this.player)
+		this.screen = new GameScreen(this.display, this.uiDisplay, this.player)
 	}
 
 	update(event: KeyboardEvent) {

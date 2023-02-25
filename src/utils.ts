@@ -14,6 +14,9 @@ export const generateRandomPoint = (
 	const y = Math.floor(Math.random() * (maxY - minY + 1) + minY)
 	return { x: x, y: y }
 }
+export const getRandomFromArray = (array: any[]) => {
+	return array[generateRandomNumber(0, array.length)]
+}
 
 export const getRandomDir = (): Point => {
 	switch (generateRandomNumber(0, 3)) {

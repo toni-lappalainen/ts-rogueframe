@@ -6,7 +6,6 @@ export abstract class BaseScreen {
 	abstract inputHandler: BaseInputHandler
 
 	protected constructor(public display: Display, public player: Entity) {}
-	generateFloor() {}
 
 	abstract update(event: KeyboardEvent): BaseScreen
 

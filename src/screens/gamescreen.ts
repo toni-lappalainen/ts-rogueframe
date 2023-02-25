@@ -1,4 +1,4 @@
-import { Display } from 'rot-js'
+import { Display, Scheduler } from 'rot-js'
 import {
 	BaseInputHandler,
 	GameInputHandler,
@@ -11,16 +11,21 @@ import { GameMap } from '../map'
 import { WorldMap } from '../overworld'
 import { generateIslands } from '../islandgen'
 import { generateDungeon } from '../procgen'
-import { renderFrameWithTitle, renderHearts, renderInventory } from '../render'
+import {
+	renderFrameWithTitle,
+	renderHearts,
+	renderInventory,
+	renderUI,
+	renderMinimap,
+} from '../render'
 import { ImpossibleException } from '../messagelog'
 import { Colors } from '../values'
 import { BaseScreen } from './screen'
 import { Tribe, generateTribes } from '../gameplay/tribes'
-import * as tiles from '../tiles'
 
 export class GameScreen extends BaseScreen {
-	public static readonly MAP_WIDTH = 80 * 1.5 //* 10
-	public static readonly MAP_HEIGHT = 50 * 1.5 // * 8
+	public static readonly MAP_WIDTH = 80 * 4.5 //* 10
+	public static readonly MAP_HEIGHT = 50 * 6 // * 8
 	public static readonly MAX_ROOMS = 12
 	public static readonly MIN_ROOM_SIZE = 3
 	public static readonly MAX_ROOM_SIZE = 12
@@ -33,9 +38,11 @@ export class GameScreen extends BaseScreen {
 	gameMap!: GameMap
 	worldMap!: WorldMap
 	tribes!: Tribe[]
+	scheduler = new Scheduler.Action()
 
 	constructor(
 		display: Display,
+		public uiDisplay: Display,
 		player: Entity,
 		public currentFloor: number = 0
 	) {
@@ -57,9 +64,7 @@ export class GameScreen extends BaseScreen {
 		this.tribes = generateTribes(this.worldMap.islands)
 		console.log(this.tribes)
 		this.tribes.forEach((tribe) => {
-			tribe.island.locations.forEach((loc) => {
-				this.worldMap.tiles[loc.x][loc.y] = tiles.TEST
-			})
+			tribe.island.locations.forEach((loc) => {})
 		})
 	}
 
@@ -114,12 +119,25 @@ export class GameScreen extends BaseScreen {
 
 	render() {
 		this.display.clear()
-		window.msgLog.render(this.display, 21, 45, 40, 5)
-		//renderHearts(this.display, 1, 47, 5);
-
-		this.display.drawText(0, 47, `Dungeon level: ${this.currentFloor}`)
-		//	this.gameMap.render();
 		this.worldMap.render()
+		window.msgLog.render(this.display, 21, 45, 40, 5)
+		this.display.drawText(50, 5, 'teaefae')
+
+		this.uiDisplay.clear()
+		for (let x = 0; x < GameScreen.MAP_WIDTH / 4; x++) {
+			for (let y = 0; y < GameScreen.MAP_HEIGHT / 4; y++) {
+				this.uiDisplay.draw(x, y, null, null, Colors.Black)
+			}
+		}
+
+		const resources = []
+		for (const [key, value] of Object.entries(this.tribes[0].resources)) {
+			resources.push(`${key}: ${value}`)
+		}
+
+		const data = [`name: ${this.tribes[0].name}`, ...resources]
+		renderUI(this.uiDisplay, data)
+		renderMinimap(this.uiDisplay, this.tribes[0].center, this.worldMap.tiles)
 
 		if (this.inputHandler.inputState === InputState.Log) {
 			renderFrameWithTitle(3, 3, 74, 38, 'Message Log')
