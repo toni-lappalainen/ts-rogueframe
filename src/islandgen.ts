@@ -29,7 +29,7 @@ export class Island {
 class IslandWorld {
 	tiles: Tile[][]
 	islands: Island[]
-	margin: number = 10
+	margin: number = 20
 	grid: any
 	islandAmount: number
 	//noise: any
@@ -147,7 +147,6 @@ class IslandWorld {
 				if (this.grid[x][y] === 1) {
 					let island = this.fill(x, y, 1)
 					this.islands.push(island)
-					console.log(island?.locations.length)
 					if (island?.locations.length > 50) this.islandAmount++
 				}
 			}
@@ -324,7 +323,6 @@ class IslandWorld {
 		scale: number = 6,
 		shapeFactor1 = 1,
 		shapeFactor2 = 1
-		//	margin = this.margin
 	) {
 		const elevationSum = new Array(this.width)
 
@@ -387,7 +385,19 @@ class IslandWorld {
 				}
 			}
 		})
-		//this.calculateBlueNoise();
+		for (let x = 0; x < this.width; x++) {
+			for (let y = 0; y < this.height; y++) {
+				elevationSum[x][y] = this.shapeIsland(
+					x,
+					y,
+					elevationSum[x][y],
+					0.9,
+					this.width,
+					this.height
+				)
+			}
+		}
+
 		return elevationSum
 	}
 	intersects(other: IslandWorld): boolean {

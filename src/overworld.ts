@@ -96,6 +96,26 @@ export class WorldMap {
 		return false
 	}
 
+	renderZoomed(center: Point) {
+		let lx = center.x - 20
+		let ly = center.y - 20
+		let w = center.x + lx
+		let h = center.y + ly
+		console.log(center.x, center.y)
+
+		for (let x = lx; x < w; x++) {
+			for (let y = ly; y < h; y++) {
+				let tile
+				let char = ' '
+				if (this.tiles[x] === undefined || this.tiles[x][y] === undefined)
+					tile = Colors.Black
+				else tile = this.tiles[x][y].dark.bg
+
+				this.display.draw(x, y, char, Colors.White, tile)
+			}
+		}
+	}
+
 	render() {
 		for (let x = 0; x < this.tiles.length; x++) {
 			const col = this.tiles[x]

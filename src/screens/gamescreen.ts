@@ -120,6 +120,7 @@ export class GameScreen extends BaseScreen {
 	render() {
 		this.display.clear()
 		this.worldMap.render()
+		//this.worldMap.renderZoomed(this.tribes[0].center)
 		window.msgLog.render(this.display, 21, 45, 40, 5)
 		this.display.drawText(50, 5, 'teaefae')
 
@@ -137,7 +138,7 @@ export class GameScreen extends BaseScreen {
 
 		const data = [`name: ${this.tribes[0].name}`, ...resources]
 		renderUI(this.uiDisplay, data)
-		renderMinimap(this.uiDisplay, this.tribes[0].center, this.worldMap.tiles)
+		//renderMinimap(this.uiDisplay, this.tribes[0].center, this.worldMap.tiles)
 
 		if (this.inputHandler.inputState === InputState.Log) {
 			renderFrameWithTitle(3, 3, 74, 38, 'Message Log')
