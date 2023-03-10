@@ -24,8 +24,8 @@ import { BaseScreen } from './screen'
 import { Tribe, generateTribes } from '../gameplay/tribes'
 
 export class GameScreen extends BaseScreen {
-	public static readonly MAP_WIDTH = 80 * 4.5 //* 10
-	public static readonly MAP_HEIGHT = 50 * 6 // * 8
+	public static readonly MAP_WIDTH = 64 //* 10
+	public static readonly MAP_HEIGHT = 50 // * 8
 	public static readonly MAX_ROOMS = 12
 	public static readonly MIN_ROOM_SIZE = 3
 	public static readonly MAX_ROOM_SIZE = 12
@@ -50,6 +50,7 @@ export class GameScreen extends BaseScreen {
 		this.generateWorld()
 
 		this.inputHandler = new GameInputHandler()
+		//window.engine.runGame()
 	}
 
 	generateWorld(): void {
@@ -97,21 +98,8 @@ export class GameScreen extends BaseScreen {
 		})
 	}
 
-	update(event: KeyboardEvent) {
-		const action = this.inputHandler.handleKeyboardInput(event)
-		if (action instanceof Action) {
-			try {
-				//		action.perform(this.player, this.gameMap);
-				//	this.handleEnemyTurns();
-				//	this.gameMap.updateFov(this.player);
-			} catch (error) {
-				if (error instanceof ImpossibleException) {
-					window.msgLog.addMessage(error.message, Colors.Gray)
-				}
-			}
-		}
-
-		this.inputHandler = this.inputHandler.nextHandler
+	update() {
+		//		this.inputHandler = this.inputHandler.nextHandler
 
 		this.render()
 		return this
@@ -122,7 +110,6 @@ export class GameScreen extends BaseScreen {
 		this.worldMap.render()
 		//this.worldMap.renderZoomed(this.tribes[0].center)
 		window.msgLog.render(this.display, 21, 45, 40, 5)
-		this.display.drawText(50, 5, 'teaefae')
 
 		this.uiDisplay.clear()
 		for (let x = 0; x < GameScreen.MAP_WIDTH / 4; x++) {

@@ -1,7 +1,11 @@
 import { Entity } from './entity'
 import { Engine } from './engine'
 import { getCircle, isEqual, multiplyXY, addXY } from './utils'
-import { renderFrameWithTitle, renderNamesAtLocation } from './render'
+import {
+	renderFrameWithTitle,
+	renderNamesAtLocation,
+	renderCursor,
+} from './render'
 import { Colors } from './values'
 import {
 	Action,
@@ -248,16 +252,16 @@ export class LogAction extends Action {
 
 export const handleMouse = (
 	event: MouseEvent,
-	pos: Point = { x: 0, y: 0 },
-	gameMap: GameMap
+	pos: Point = { x: 0, y: 0 }
+	//gameMap: GameMap
 ) => {
 	// Map inputs
-	if (gameMap.isInBounds(pos) && gameMap.tiles[pos.y][pos.x].visible) {
-		if (event.button === 0) {
-			const entities = gameMap.entities.filter((e) => isEqual(e.pos, pos))
-			if (entities.length) renderNamesAtLocation(pos, entities)
-		}
-	}
+	//if (gameMap.isInBounds(pos) && gameMap.tiles[pos.y][pos.x].visible) {
+	renderCursor(pos)
+	//	const entities = gameMap.entities.filter((e) => isEqual(e.pos, pos))
+	//if (entities.length) renderNamesAtLocation(pos, entities)
+	//}
+	//}
 }
 export abstract class SelectIndexHandler extends BaseInputHandler {
 	protected constructor() {

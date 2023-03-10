@@ -29,7 +29,7 @@ export class Island {
 class IslandWorld {
 	tiles: Tile[][]
 	islands: Island[]
-	margin: number = 20
+	margin: number = 10
 	grid: any
 	islandAmount: number
 	//noise: any
@@ -47,9 +47,9 @@ class IslandWorld {
 		this.islands = new Array()
 		this.tiles = new Array(this.width)
 		this.grid = createMatrix(this.width, this.height, 0)
-		while (this.islandAmount < 5) {
-			this.createBiomes()
-		}
+		//while (this.islandAmount < 1) {
+		this.createBiomes()
+		//}
 	}
 
 	getTiles(): Tile[][] {
@@ -409,38 +409,7 @@ class IslandWorld {
 		)
 	}
 }
-/*
-function* connectRooms(
-	a: Island,
-	b: Island
-): Generator<[number, number], void, void> {
-	// set the start point of our tunnel at the center of the first room
-	let current = a.center;
-	// set the end point at the center of the second room
-	const end = b.center;
 
-	// flip a coin to see if we go horizontally first or vertically
-	let horizontal = Math.random() < 0.5;
-	// set our axisIndex to 0 (x axis) if horizontal or 1 (y axis) if vertical
-	let axisIndex = horizontal ? 0 : 1;
-
-	// we'll loop until our current is the same as the end point
-	while (current[0] !== end[0] || current[1] !== end[1]) {
-		//are we tunneling in the positive or negative direction?
-
-		// if direction is 0 we have hit the destination in one direction
-		const direction = Math.sign(end[axisIndex] - current[axisIndex]);
-		if (direction !== 0) {
-			current[axisIndex] += direction;
-			yield current;
-		} else {
-			// we've finished in this direction so switch to the other
-			axisIndex = axisIndex === 0 ? 1 : 0;
-			yield current;
-		}
-	}
-}
-*/
 const intersects = (area1: Point, area2: Point, size: number) => {
 	const a = { x1: area1.x, y1: area1.y, x2: area1.x + size, y2: area1.y + size }
 	const b = { x1: area2.x, y1: area2.y, x2: area2.x + size, y2: area2.y + size }
@@ -462,7 +431,7 @@ export const generateIslands = (
 	display: Display
 ): WorldMap => {
 	const world = new WorldMap(mapWidth, mapHeight, display)
-	const islandWorld = new IslandWorld(0, 0, mapWidth, mapHeight, 3.5, 3, 0, 0)
+	const islandWorld = new IslandWorld(0, 0, mapWidth, mapHeight, 2, 4, 0.4, 0)
 	world.setTiles(islandWorld.getTiles())
 	world.setIslands(islandWorld.islands)
 

@@ -20,7 +20,6 @@ const drawColoredBar = (
 }
 
 export const renderUI = (display: Display, data: string[]) => {
-	console.log(data.length)
 	for (let i = 0; i < data.length; i++) {
 		display.drawText(2, i + 1, data[i], 20)
 	}
@@ -46,6 +45,16 @@ export const renderMinimap = (
 			display.drawOver(x + 1, y + 20, char, Colors.White, tile)
 		}
 	}
+}
+
+export const renderCursor = (pos: Point) => {
+	window.engine.display.draw(
+		pos.x,
+		pos.y,
+		'X',
+		Colors.White,
+		Colors.Transparent
+	)
 }
 
 export const renderHearts = (
